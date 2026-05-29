@@ -1,0 +1,24 @@
+product-name = "workime"
+version = "0.1.0"
+identifier = "com.github.klaidoshka.workime"
+
+[build]
+before-dev-command = "pnpm dev"
+dev-url = "http://localhost:1420"
+before-build-command = "pnpm build"
+frontend-dist = "../build"
+
+[[app.windows]]
+title = "workime"
+width = 800
+height = 600
+
+[bundle]
+active = true
+icon = [
+  "icons/32x32.png",
+  "icons/128x128.png",
+  "icons/128x128@2x.png",
+  "icons/icon.icns",
+  "icons/icon.ico",
+]
