@@ -1,14 +1,13 @@
 <script lang="ts">
   import TimeRangePicker from "$lib/components/common/timeRangePicker/TimeRangePicker.svelte";
   import type { NoteAttachment } from "$lib/representation/note";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { Paperclip, Send, X } from "@lucide/svelte";
 
-  let props: { projectId: string } = $props();
-
+  let props: { projectId: number } = $props();
   let newNoteText = $state("");
-  let timeFrom = $state("");
-  let timeTo = $state("");
+  let timeFrom = $state<Date | undefined>(undefined);
+  let timeTo = $state<Date | undefined>(undefined);
   let pendingAttachments = $state<NoteAttachment[]>([]);
   let fileInput = $state<HTMLInputElement | null>(null);
 
@@ -18,6 +17,7 @@
 
   function onFilesSelected(e: Event) {
     const files = (e.target as HTMLInputElement).files;
+
     if (!files?.length) {
       return;
     }
@@ -52,8 +52,8 @@
     );
 
     newNoteText = "";
-    timeFrom = "";
-    timeTo = "";
+    timeFrom = undefined;
+    timeTo = undefined;
     pendingAttachments = [];
   }
 

@@ -4,11 +4,12 @@ export interface NoteAttachment {
 }
 
 export interface Note {
-  id: string;
-  timestamp: Date;
+  id: number;
+  createdAt: Date;
+  modifiedAt?: Date;
   content: string;
   tags: string[];
-  timeTakenFrom?: number;
-  timeTakenTo?: number;
+  timeTakenFrom?: Date;
+  timeTakenTo?: Date;
   attachments?: NoteAttachment[];
 }

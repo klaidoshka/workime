@@ -1,8 +1,8 @@
 export interface Project {
-  id: string;
+  id: number;
   label: string;
   createdAt: Date;
-  modifiedAt: Date;
+  modifiedAt?: Date;
   finished: boolean;
   pinned: boolean;
   scratchPad?: string;

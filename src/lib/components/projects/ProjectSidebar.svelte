@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { Search } from "@lucide/svelte";
   import ProjectCard from "./ProjectCard.svelte";
 

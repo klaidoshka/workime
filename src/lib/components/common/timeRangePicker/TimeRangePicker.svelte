@@ -1,29 +1,36 @@
 <script lang="ts">
-  import TimeUtils from "$lib/utils/time";
   import {
+      applyStringToDate,
       autocompleteTime,
       calculateDuration,
+      dateToTimeString,
       formatInputString,
   } from "./TimeRangePicker";
 
-  let { timeFrom = $bindable(""), timeTo = $bindable("") } = $props<{
-    timeFrom: string;
-    timeTo: string;
+  let { timeFrom = $bindable(undefined), timeTo = $bindable(undefined) } = $props<{
+    timeFrom: Date | undefined;
+    timeTo: Date | undefined;
   }>();
 
+  let localFrom = $state(dateToTimeString(timeFrom));
+  let localTo = $state(dateToTimeString(timeTo));
   let fromInputEl = $state<HTMLInputElement | null>(null);
   let toInputEl = $state<HTMLInputElement | null>(null);
 
   $effect(() => {
-    if (fromInputEl) {
-      fromInputEl.value = timeFrom;
-    }
+    localFrom = dateToTimeString(timeFrom);
   });
 
   $effect(() => {
-    if (toInputEl) {
-      toInputEl.value = timeTo;
-    }
+    localTo = dateToTimeString(timeTo);
+  });
+
+  $effect(() => {
+    if (fromInputEl) fromInputEl.value = localFrom;
+  });
+
+  $effect(() => {
+    if (toInputEl) toInputEl.value = localTo;
   });
 
   function handleInput(e: Event, target: "from" | "to") {
@@ -31,11 +38,9 @@
     const formatted = formatInputString(input.value);
 
     if (target === "from") {
-      timeFrom = formatted;
-    }
-
-    if (target === "to") {
-      timeTo = formatted;
+      localFrom = formatted;
+    } else {
+      localTo = formatted;
     }
 
     input.value = formatted;
@@ -43,18 +48,18 @@
 
   function handleBlur(target: "from" | "to") {
     if (target === "from") {
-      timeFrom = autocompleteTime(timeFrom);
+      localFrom = autocompleteTime(localFrom);
+      timeFrom = applyStringToDate(localFrom, timeFrom);
     }
 
     if (target === "to") {
-      timeTo = autocompleteTime(timeTo);
+      localTo = autocompleteTime(localTo);
+      timeTo = applyStringToDate(localTo, timeTo);
     }
 
-    const start = TimeUtils.stringToMinutes(timeFrom);
-    const end = TimeUtils.stringToMinutes(timeTo);
-
-    if (start !== undefined && end !== undefined && end < start) {
-      timeTo = timeFrom;
+    if (timeFrom && timeTo && timeTo < timeFrom) {
+      timeTo = new Date(timeFrom);
+      localTo = localFrom;
     }
   }
 
@@ -70,7 +75,7 @@
       type="text"
       maxlength="5"
       placeholder="09:00"
-      bind:value={timeFrom}
+      bind:value={localFrom}
       oninput={(e) => handleInput(e, "from")}
       onblur={() => handleBlur("from")}
       class="w-14 px-1.5 py-0.5 text-center font-mono text-xs rounded-lg border border-bd bg-s3 text-tx placeholder:text-tx-faint focus:outline-none focus:border-ac-br focus:shadow-[0_0_0_2px_var(--color-ac-bg)] transition-colors" />
@@ -85,7 +90,7 @@
       type="text"
       maxlength="5"
       placeholder="17:00"
-      bind:value={timeTo}
+      bind:value={localTo}
       oninput={(e) => handleInput(e, "to")}
       onblur={() => handleBlur("to")}
       class="w-14 px-1.5 py-0.5 text-center font-mono text-xs rounded-lg border border-bd bg-s3 text-tx placeholder:text-tx-faint focus:outline-none focus:border-ac-br focus:shadow-[0_0_0_2px_var(--color-ac-bg)] transition-colors" />

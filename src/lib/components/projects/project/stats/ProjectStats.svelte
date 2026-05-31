@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Note } from "$lib/representation/note";
   import type { Project } from "$lib/representation/project";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { calculateDashboardStats } from "./ProjectStats";
 
   let props: { project: Project; notes: Note[] } = $props();

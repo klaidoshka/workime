@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Project } from "$lib/representation/project";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { Bold, Italic, List } from "@lucide/svelte";
 
   let props: { project: Project } = $props();
