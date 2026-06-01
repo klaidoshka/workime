@@ -2,7 +2,7 @@
   import type { Note } from "$lib/representation/note";
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/ProjectStore.svelte";
-    import { calculateDashboardStats } from "./ProjectStats";
+  import { calculateDashboardStats } from "./ProjectStats";
 
   let props: { project: Project; notes: Note[] } = $props();
 
@@ -78,17 +78,19 @@
   </div>
 
   <div class="metric-tile gap-3">
-    <div class="flex items-start justify-between gap-4">
-      <div class="flex flex-col gap-1 min-w-0">
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex flex-col gap-0.5 min-w-0">
         <span class="metric-label">Expected Budget</span>
         {#if stats.targetHours > 0}
           <p class="text-xs text-tx-faint leading-relaxed">
-            <span class="font-mono tabular-nums"
-              >{stats.remainingFormatted}</span> remaining
+            <span class="font-mono tabular-nums">
+              {stats.remainingFormatted}
+            </span> remaining
           </p>
         {/if}
       </div>
-      <div class="flex items-baseline gap-1.5 shrink-0 pt-0.5">
+
+      <div class="flex items-center gap-1.5 shrink-0">
         <input
           type="number"
           min="0"
@@ -96,10 +98,11 @@
           placeholder="0"
           value={stats.targetHours || ""}
           oninput={handleExpectedHoursInput}
-          class="input-budget w-14" />
+          class="input-budget w-14 text-center" />
         <span class="text-sm text-tx-faint font-mono">hrs</span>
       </div>
     </div>
+
     {#if stats.targetHours > 0}
       <div class="flex flex-col gap-2 pt-1">
         <div class="w-full bg-s3/80 rounded-full h-1.5 overflow-hidden">
