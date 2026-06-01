@@ -21,7 +21,10 @@
   <div class="flex-1 h-full flex flex-col gap-3 overflow-hidden">
     <ProjectHeader {project} bind:noteSearch />
     <ProjectNotes notes={filteredNotes} />
-    <SendNote projectId={project.id} />
+
+    {#key project.id}
+      <SendNote projectId={project.id} />
+    {/key}
   </div>
   <aside
     class="w-80 h-full flex flex-col gap-3 shrink-0 overflow-hidden min-h-0">

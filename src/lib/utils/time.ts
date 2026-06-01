@@ -38,25 +38,6 @@ class TimeUtils {
 
     return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
-
-  static calculateTimeRangeDuration(timeFrom: string, timeTo: string): string {
-    if (!timeFrom || !timeTo) {
-      return "";
-    }
-
-    const [fh, fm] = timeFrom.split(":").map(Number);
-    const [th, tm] = timeTo.split(":").map(Number);
-
-    let diff = th * 60 + tm - (fh * 60 + fm);
-    if (diff < 0) {
-      diff += 24 * 60;
-    }
-
-    const h = Math.floor(diff / 60);
-    const m = diff % 60;
-
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  }
 }
 
 export default TimeUtils;
