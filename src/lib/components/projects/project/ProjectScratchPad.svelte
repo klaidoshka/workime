@@ -58,7 +58,7 @@
   <header
     class="flex items-center justify-between gap-2 px-4 pt-3 pb-2 shrink-0">
     <h2 class="section-label">Scratchpad</h2>
-    <span class="text-[10px] font-mono text-tx-faint">
+    <span class="text-2xs font-mono text-tx-faint">
       {saveState === "saved" ? "Saved" : "Saving…"}
     </span>
   </header>
@@ -96,7 +96,7 @@
         <List class="w-3.5 h-3.5" />
       </button>
     </div>
-    <span class="text-[10px] font-mono text-tx-faint tabular-nums">
+    <span class="text-2xs font-mono text-tx-faint tabular-nums">
       {charCount} {charCount === 1 ? "char" : "chars"}
     </span>
   </footer>

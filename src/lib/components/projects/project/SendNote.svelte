@@ -160,7 +160,7 @@
         type="button"
         onclick={sendNote}
         disabled={!canSend}
-        class="h-9 px-4 flex items-center justify-center gap-1.5 rounded-lg cursor-pointer btn-primary text-sm
+        class="h-9 px-4 flex items-center justify-center gap-1.5 rounded-lg cursor-pointer btn-primary
                disabled:opacity-40 disabled:cursor-not-allowed">
         <Send class="w-4 h-4" />
         Send

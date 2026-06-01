@@ -6,6 +6,24 @@
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
+  /* Text sizes */
+  --text-2xs: 0.6875rem;
+  --text-2xs-line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs-line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm-line-height: 1.25rem;
+  --text-md: 1rem;
+  --text-md-line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg-line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl-line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl-line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl-line-height: 2.25rem;
+
   /* Surfaces */
   --color-s0: #121212;
   --color-s1: #1c1c1c;
@@ -59,11 +77,11 @@
   }
 
   .section-label {
-    @apply text-[10px] font-semibold uppercase tracking-widest text-tx-faint;
+    @apply text-2xs font-semibold uppercase tracking-widest text-tx-faint;
   }
 
   .metric-label {
-    @apply text-[10px] font-semibold uppercase tracking-wide text-tx-faint;
+    @apply text-2xs font-semibold uppercase tracking-wide text-tx-faint;
   }
 
   .metric-tile {
@@ -99,21 +117,22 @@
   }
 
   .btn-primary {
-    @apply rounded-lg bg-ac-br font-semibold text-s0 transition-colors hover:bg-ac;
+    @apply rounded-lg bg-ac-br text-sm font-semibold text-s0 transition-colors hover:bg-ac;
+  }
+
+  .input-field {
+    @apply text-sm rounded-xl border border-bd bg-s3 text-tx transition-[border-color,box-shadow] placeholder:text-tx-faint focus:border-ac-br focus:shadow-[0_0_0_3px_var(--color-ac-bg)] focus:outline-none;
   }
 
   .timeline-rail {
     @apply border-l-2 border-bd-str;
   }
 
-  .input-field {
-    @apply rounded-xl border border-bd bg-s3 text-tx transition-[border-color,box-shadow] placeholder:text-tx-faint focus:border-ac-br focus:shadow-[0_0_0_3px_var(--color-ac-bg)] focus:outline-none;
-  }
 }
 
 @layer base {
   body {
-    @apply bg-s0 font-sans text-tx;
+    @apply bg-s0 font-sans text-sm text-tx;
   }
 }
 

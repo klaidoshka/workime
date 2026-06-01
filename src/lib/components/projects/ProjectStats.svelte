@@ -199,7 +199,7 @@
             style="width: {stats.progressPercentage}%">
           </div>
         </div>
-        <div class="flex justify-between text-[11px] font-mono tabular-nums">
+        <div class="flex justify-between text-2xs font-mono tabular-nums">
           <span class="text-tx-faint uppercase tracking-wide font-sans">
             Budget used
           </span>
@@ -221,7 +221,7 @@
             {row.value}
           </span>
           {#if row.hint}
-            <span class="text-[11px] text-tx-faint leading-snug">
+            <span class="text-2xs text-tx-faint leading-snug">
               {row.hint}
             </span>
           {/if}

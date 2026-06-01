@@ -72,12 +72,12 @@
                 class="flex items-baseline justify-between mb-2 pb-1.5 border-b border-bd-dim">
                 <div class="flex items-center gap-2">
                   <span
-                    class="text-[10px] font-medium uppercase tracking-wide text-tx-faint font-mono">
+                    class="text-2xs font-medium uppercase tracking-wide text-tx-faint font-mono">
                     {note.timestamp.toLocaleString()}
                   </span>
                   {#if note.timeTakenFrom !== undefined && note.timeTakenTo !== undefined}
                     <span
-                      class="inline-flex items-center gap-1 bg-s3 border border-bd text-tx-dim rounded-md font-mono text-[11px] px-1.5 py-px">
+                      class="inline-flex items-center gap-1 bg-s3 border border-bd text-tx-dim rounded-md font-mono text-2xs px-1.5 py-px">
                       <Clock class="w-3 h-3 text-tx-faint" />
                       {formatMinutesToTime(note.timeTakenFrom)} – {formatMinutesToTime(
                         note.timeTakenTo,
@@ -118,7 +118,7 @@
               <div class="flex flex-wrap gap-1.5 pt-1">
                 {#each note.tags as tag}
                   <span
-                    class="bg-s3 text-tx-dim border border-bd text-[11px] font-medium rounded-md px-1.75 py-px">
+                    class="bg-s3 text-tx-dim border border-bd text-2xs font-medium rounded-md px-1.75 py-px">
                     #{tag}
                   </span>
                 {/each}
