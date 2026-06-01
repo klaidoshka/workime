@@ -33,15 +33,18 @@ export function autocompleteTime(timeStr: string): string {
 
   if (digits.length === 1 || digits.length === 2) {
     const h = Math.min(parseInt(digits, 10), 23);
+
     finalHours = String(h).padStart(2, "0");
   } else if (digits.length === 3) {
     const h = Math.min(parseInt(digits.slice(0, 1), 10), 23);
     const m = Math.min(parseInt(digits.slice(1), 10), 59);
+
     finalHours = String(h).padStart(2, "0");
     finalMinutes = String(m).padStart(2, "0");
   } else if (digits.length === 4) {
     const h = Math.min(parseInt(digits.slice(0, 2), 10), 23);
     const m = Math.min(parseInt(digits.slice(2), 10), 59);
+
     finalHours = String(h).padStart(2, "0");
     finalMinutes = String(m).padStart(2, "0");
   }
