@@ -2,108 +2,18 @@
   import type { Note } from "$lib/representation/note";
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/ProjectStore.svelte";
+    import { calculateDashboardStats } from "./ProjectStats";
 
   let props: { project: Project; notes: Note[] } = $props();
 
-  type DetailRow = {
-    label: string;
-    value: string;
-    hint?: string;
-  };
+  const stats = $derived(calculateDashboardStats(props.project, props.notes));
 
-  function formatMinutes(totalMinutes: number): string {
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  }
-
-  function formatRelativeDate(date: Date): string {
-    const diffMs = Date.now() - date.getTime();
-    const diffDays = Math.floor(diffMs / 86_400_000);
-
-    if (diffDays < 0) return "Just now";
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    });
-  }
-
-  const stats = $derived.by(() => {
-    let totalMinutes = 0;
-    let timedNoteCount = 0;
-
-    props.notes.forEach((n) => {
-      if (n.timeTakenFrom !== undefined && n.timeTakenTo !== undefined) {
-        let diff = n.timeTakenTo - n.timeTakenFrom;
-        if (diff < 0) diff += 24 * 60;
-        totalMinutes += diff;
-        timedNoteCount += 1;
-      }
-    });
-
-    const noteCount = props.notes.length;
-    const avgSessionMinutes =
-      timedNoteCount > 0 ? Math.round(totalMinutes / timedNoteCount) : 0;
-
-    let daysActive = 1;
-
-    if (props.project) {
-      const start = new Date(props.project.createdAt).getTime();
-      const end = props.project.finished
-        ? new Date(props.project.modifiedAt).getTime()
-        : Date.now();
-
-      daysActive = Math.max(
-        1,
-        Math.ceil(Math.max(0, end - start) / 86_400_000),
-      );
-    }
-
-    const dailyAvgMinutes = Math.round(totalMinutes / daysActive);
-    const targetHours = props.project.expectedFinishHours ?? 0;
-    const loggedHours = totalMinutes / 60;
-    const progressPercentage =
-      targetHours > 0
-        ? Math.max(0, Math.round((loggedHours / targetHours) * 100))
-        : 0;
-    const remainingHours = Math.max(0, targetHours - loggedHours);
-    const remainingFormatted =
-      remainingHours >= 1
-        ? `${remainingHours.toFixed(1)}h`
-        : `${Math.round(remainingHours * 60)}m`;
-
-    const lastActivity = props.notes.length
-      ? new Date(Math.max(...props.notes.map((n) => n.timestamp.getTime())))
-      : new Date(props.project.modifiedAt);
-
-    return {
-      totalFormatted: formatMinutes(totalMinutes),
-      dailyAvgFormatted: formatMinutes(dailyAvgMinutes),
-      avgSessionFormatted: formatMinutes(avgSessionMinutes),
-      noteCount,
-      timedNoteCount,
-      daysActive,
-      daysLabel: daysActive === 1 ? "day" : "days",
-      progressPercentage,
-      targetHours,
-      remainingFormatted,
-      lastActivityLabel: formatRelativeDate(lastActivity),
-      hasTimedNotes: timedNoteCount > 0,
-    };
-  });
-
-  const detailRows = $derived.by((): DetailRow[] => [
+  const detailRows = $derived([
     {
       label: "Project Lifespan",
       value: `${stats.daysActive} ${stats.daysLabel}`,
     },
-    {
-      label: "Last Activity",
-      value: stats.lastActivityLabel,
-    },
+    { label: "Last Activity", value: stats.lastActivityLabel },
     {
       label: "Total Notes",
       value: String(stats.noteCount),
@@ -173,9 +83,8 @@
         <span class="metric-label">Expected Budget</span>
         {#if stats.targetHours > 0}
           <p class="text-xs text-tx-faint leading-relaxed">
-            <span class="font-mono tabular-nums">
-              {stats.remainingFormatted}
-            </span> remaining
+            <span class="font-mono tabular-nums"
+              >{stats.remainingFormatted}</span> remaining
           </p>
         {/if}
       </div>
@@ -200,12 +109,10 @@
           </div>
         </div>
         <div class="flex justify-between text-2xs font-mono tabular-nums">
-          <span class="text-tx-faint uppercase tracking-wide font-sans">
-            Budget used
-          </span>
-          <span class="font-semibold {progressTextColor}">
-            {stats.progressPercentage}%
-          </span>
+          <span class="text-tx-faint uppercase tracking-wide font-sans"
+            >Budget used</span>
+          <span class="font-semibold {progressTextColor}"
+            >{stats.progressPercentage}%</span>
         </div>
       </div>
     {/if}
@@ -217,13 +124,10 @@
         <span class="text-sm text-tx-dim shrink-0">{row.label}</span>
         <div class="flex flex-col items-end gap-0.5 min-w-0 text-right">
           <span
-            class="text-sm font-medium font-mono text-tx tabular-nums leading-snug">
-            {row.value}
-          </span>
+            class="text-sm font-medium font-mono text-tx tabular-nums leading-snug"
+            >{row.value}</span>
           {#if row.hint}
-            <span class="text-2xs text-tx-faint leading-snug">
-              {row.hint}
-            </span>
+            <span class="text-2xs text-tx-faint leading-snug">{row.hint}</span>
           {/if}
         </div>
       </div>
