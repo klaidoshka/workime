@@ -1,183 +1,232 @@
 <script lang="ts">
-    import { ChartBar } from "@lucide/svelte";
-    import type { Project } from "$lib/representation/project";
-    import type { Note } from "$lib/representation/note";
-    import instance from "$lib/stores/ProjectStore.svelte";
+  import type { Note } from "$lib/representation/note";
+  import type { Project } from "$lib/representation/project";
+  import instance from "$lib/stores/ProjectStore.svelte";
 
-    let props: {
-        project: Project;
-        notes: Note[];
-    } = $props();
+  let props: { project: Project; notes: Note[] } = $props();
 
-    const stats = $derived.by(() => {
-        let totalMinutes = 0;
+  type DetailRow = {
+    label: string;
+    value: string;
+    hint?: string;
+  };
 
-        props.notes.forEach((n) => {
-            if (n.timeTakenFrom !== undefined && n.timeTakenTo !== undefined) {
-                let diff = n.timeTakenTo - n.timeTakenFrom;
-                if (diff < 0) diff += 24 * 60;
-                totalMinutes += diff;
-            }
-        });
+  function formatMinutes(totalMinutes: number): string {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
 
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        const totalFormatted = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  function formatRelativeDate(date: Date): string {
+    const diffMs = Date.now() - date.getTime();
+    const diffDays = Math.floor(diffMs / 86_400_000);
 
-        let daysActive = 0;
+    if (diffDays < 0) return "Just now";
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+  }
 
-        if (props.project) {
-            const start = new Date(props.project.createdAt).getTime();
+  const stats = $derived.by(() => {
+    let totalMinutes = 0;
+    let timedNoteCount = 0;
 
-            const end = props.project.finished
-                ? new Date(props.project.modifiedAt).getTime()
-                : new Date().getTime();
-
-            const diffTime = Math.max(0, end - start);
-
-            daysActive = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
-
-        const targetHours = props.project.expectedFinishHours ?? 0;
-        const loggedHoursTotal = totalMinutes / 60;
-
-        const progressPercentage =
-            targetHours > 0
-                ? Math.max(
-                      0,
-                      Math.round((loggedHoursTotal / targetHours) * 100),
-                  )
-                : 0;
-
-        return {
-            totalFormatted,
-            hasData: totalMinutes > 0,
-            count: props.notes.length,
-            daysActive,
-            progressPercentage,
-            targetHours,
-        };
+    props.notes.forEach((n) => {
+      if (n.timeTakenFrom !== undefined && n.timeTakenTo !== undefined) {
+        let diff = n.timeTakenTo - n.timeTakenFrom;
+        if (diff < 0) diff += 24 * 60;
+        totalMinutes += diff;
+        timedNoteCount += 1;
+      }
     });
 
-    function handleExpectedHoursInput(e: Event) {
-        const hours = parseFloat((e.target as HTMLInputElement).value) || 0;
+    const noteCount = props.notes.length;
+    const avgSessionMinutes =
+      timedNoteCount > 0 ? Math.round(totalMinutes / timedNoteCount) : 0;
 
-        instance.updateExpectedHours(props.project.id, hours);
+    let daysActive = 1;
+
+    if (props.project) {
+      const start = new Date(props.project.createdAt).getTime();
+      const end = props.project.finished
+        ? new Date(props.project.modifiedAt).getTime()
+        : Date.now();
+
+      daysActive = Math.max(
+        1,
+        Math.ceil(Math.max(0, end - start) / 86_400_000),
+      );
     }
+
+    const dailyAvgMinutes = Math.round(totalMinutes / daysActive);
+    const targetHours = props.project.expectedFinishHours ?? 0;
+    const loggedHours = totalMinutes / 60;
+    const progressPercentage =
+      targetHours > 0
+        ? Math.max(0, Math.round((loggedHours / targetHours) * 100))
+        : 0;
+    const remainingHours = Math.max(0, targetHours - loggedHours);
+    const remainingFormatted =
+      remainingHours >= 1
+        ? `${remainingHours.toFixed(1)}h`
+        : `${Math.round(remainingHours * 60)}m`;
+
+    const lastActivity = props.notes.length
+      ? new Date(Math.max(...props.notes.map((n) => n.timestamp.getTime())))
+      : new Date(props.project.modifiedAt);
+
+    return {
+      totalFormatted: formatMinutes(totalMinutes),
+      dailyAvgFormatted: formatMinutes(dailyAvgMinutes),
+      avgSessionFormatted: formatMinutes(avgSessionMinutes),
+      noteCount,
+      timedNoteCount,
+      daysActive,
+      daysLabel: daysActive === 1 ? "day" : "days",
+      progressPercentage,
+      targetHours,
+      remainingFormatted,
+      lastActivityLabel: formatRelativeDate(lastActivity),
+      hasTimedNotes: timedNoteCount > 0,
+    };
+  });
+
+  const detailRows = $derived.by((): DetailRow[] => [
+    {
+      label: "Project Lifespan",
+      value: `${stats.daysActive} ${stats.daysLabel}`,
+    },
+    {
+      label: "Last Activity",
+      value: stats.lastActivityLabel,
+    },
+    {
+      label: "Total Notes",
+      value: String(stats.noteCount),
+      hint:
+        stats.timedNoteCount > 0
+          ? `${stats.timedNoteCount} with time logged`
+          : undefined,
+    },
+    {
+      label: "Avg Session",
+      value: stats.hasTimedNotes ? stats.avgSessionFormatted : "—",
+      hint: stats.hasTimedNotes ? "Per timed note" : "No timed notes yet",
+    },
+  ]);
+
+  function handleExpectedHoursInput(e: Event) {
+    const hours = parseFloat((e.target as HTMLInputElement).value) || 0;
+    instance.updateExpectedHours(props.project.id, hours);
+  }
+
+  const progressBarColor = $derived(
+    stats.progressPercentage > 125
+      ? "bg-err-br"
+      : stats.progressPercentage > 100
+        ? "bg-warn-br"
+        : "bg-ac-br",
+  );
+  const progressTextColor = $derived(
+    stats.progressPercentage > 125
+      ? "text-err-br"
+      : stats.progressPercentage > 100
+        ? "text-warn-br"
+        : "text-tx-dim",
+  );
 </script>
 
-<div
-    class="bg-gray-100/80 border border-gray-200/50 p-3 rounded-xl flex flex-col gap-2.5"
->
-    <div class="flex items-center gap-2 text-gray-400 px-1">
-        <ChartBar class="w-4 h-4" />
-        <h2 class="text-xs font-bold uppercase tracking-wider">
-            Time Dashboard
-        </h2>
+<aside class="island shrink-0 w-full p-5 flex flex-col gap-5 font-sans">
+  <header class="flex flex-col gap-1">
+    <h2 class="section-label">Time Dashboard</h2>
+    <p class="text-xs text-tx-faint leading-relaxed">
+      {props.project.finished ? "Completed project" : "Active project"} · {stats.noteCount}
+      {stats.noteCount === 1 ? "note" : "notes"}
+    </p>
+  </header>
+
+  <div class="metric-tile gap-2 py-4">
+    <span class="metric-label">Time Logged</span>
+    <p
+      class="text-3xl font-semibold font-mono text-ac-br leading-tight tabular-nums">
+      {stats.totalFormatted}
+    </p>
+    {#if stats.hasTimedNotes}
+      <p class="text-xs text-tx-faint leading-relaxed">
+        ~<span class="font-mono tabular-nums">{stats.dailyAvgFormatted}</span> per
+        day on average
+      </p>
+    {:else}
+      <p class="text-xs text-tx-faint leading-relaxed">
+        Add time ranges on notes to track hours
+      </p>
+    {/if}
+  </div>
+
+  <div class="metric-tile gap-3">
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-col gap-1 min-w-0">
+        <span class="metric-label">Expected Budget</span>
+        {#if stats.targetHours > 0}
+          <p class="text-xs text-tx-faint leading-relaxed">
+            <span class="font-mono tabular-nums">
+              {stats.remainingFormatted}
+            </span> remaining
+          </p>
+        {/if}
+      </div>
+      <div class="flex items-baseline gap-1.5 shrink-0 pt-0.5">
+        <input
+          type="number"
+          min="0"
+          step="0.1"
+          placeholder="0"
+          value={stats.targetHours || ""}
+          oninput={handleExpectedHoursInput}
+          class="input-budget w-14" />
+        <span class="text-sm text-tx-faint font-mono">hrs</span>
+      </div>
     </div>
-
-    <div class="flex flex-col gap-2">
-        <div
-            class="bg-white border border-gray-200/60 p-3 rounded-lg shadow-sm flex flex-col gap-2"
-        >
-            <div class="flex items-center justify-between">
-                <span
-                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wide"
-                    >Expected Budget</span
-                >
-                <div class="flex items-center gap-1 font-mono text-xs">
-                    <input
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        placeholder="0"
-                        value={stats.targetHours || ""}
-                        oninput={handleExpectedHoursInput}
-                        class="w-16 bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5 text-center text-gray-700 font-bold focus:outline-none"
-                    />
-                    <span class="text-gray-400 font-sans">hours</span>
-                </div>
-            </div>
-
-            {#if stats.targetHours > 0}
-                <div class="flex flex-col gap-1 mt-0.5">
-                    <div
-                        class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden"
-                    >
-                        <div
-                            class="h-1.5 rounded-full transition-all duration-300 max-w-full
-                                    {stats.progressPercentage > 125
-                                ? 'bg-red-500'
-                                : stats.progressPercentage > 100
-                                  ? 'bg-orange-500'
-                                  : 'bg-emerald-500'}"
-                            style="width: {stats.progressPercentage}%"
-                        ></div>
-                    </div>
-                    <div
-                        class="flex justify-between items-center text-[10px] font-bold text-gray-400 font-mono"
-                    >
-                        <span>Usage Target</span>
-                        <span
-                            class={stats.progressPercentage > 125
-                                ? "text-red-500"
-                                : stats.progressPercentage > 100
-                                  ? "text-orange-500"
-                                  : "text-emerald-600"}
-                        >
-                            {stats.progressPercentage}%
-                        </span>
-                    </div>
-                </div>
-            {/if}
+    {#if stats.targetHours > 0}
+      <div class="flex flex-col gap-2 pt-1">
+        <div class="w-full bg-s3/80 rounded-full h-1.5 overflow-hidden">
+          <div
+            class="h-full rounded-full transition-all duration-500 max-w-full {progressBarColor}"
+            style="width: {stats.progressPercentage}%">
+          </div>
         </div>
+        <div class="flex justify-between text-[11px] font-mono tabular-nums">
+          <span class="text-tx-faint uppercase tracking-wide font-sans">
+            Budget used
+          </span>
+          <span class="font-semibold {progressTextColor}">
+            {stats.progressPercentage}%
+          </span>
+        </div>
+      </div>
+    {/if}
+  </div>
 
-        <div
-            class="bg-white border border-gray-200/60 p-3 rounded-lg shadow-sm flex items-center justify-between"
-        >
-            <div class="flex flex-col gap-0.5">
-                <span
-                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wide"
-                    >Project Lifespan</span
-                >
-                <span class="text-base font-bold font-mono text-gray-800">
-                    {stats.daysActive}
-                    {stats.daysActive === 1 ? "Day" : "Days"}
-                </span>
-            </div>
-            <span
-                class="text-xs px-2 py-0.5 font-medium rounded-full {props
-                    .project.finished
-                    ? 'bg-gray-100 text-gray-600'
-                    : 'bg-emerald-50 text-emerald-600 animate-pulse'}"
-            >
-                {props.project.finished ? "Finished" : "Active"}
+  <div class="stat-sheet">
+    {#each detailRows as row (row.label)}
+      <div class="stat-row">
+        <span class="text-sm text-tx-dim shrink-0">{row.label}</span>
+        <div class="flex flex-col items-end gap-0.5 min-w-0 text-right">
+          <span
+            class="text-sm font-medium font-mono text-tx tabular-nums leading-snug">
+            {row.value}
+          </span>
+          {#if row.hint}
+            <span class="text-[11px] text-tx-faint leading-snug">
+              {row.hint}
             </span>
+          {/if}
         </div>
-
-        <div class="grid grid-cols-2 gap-2">
-            <div
-                class="bg-white border border-gray-200/60 p-3 rounded-lg shadow-sm flex flex-col gap-0.5"
-            >
-                <span
-                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wide"
-                    >Time Logged</span
-                >
-                <span class="text-base font-bold font-mono text-gray-800"
-                    >{stats.totalFormatted}</span
-                >
-            </div>
-            <div
-                class="bg-white border border-gray-200/60 p-3 rounded-lg shadow-sm flex flex-col gap-0.5"
-            >
-                <span
-                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wide"
-                    >Notes Count</span
-                >
-                <span class="text-base font-bold font-mono text-gray-800"
-                    >{stats.count}</span
-                >
-            </div>
-        </div>
-    </div>
-</div>
+      </div>
+    {/each}
+  </div>
+</aside>

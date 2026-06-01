@@ -1,100 +1,170 @@
 <script lang="ts">
-    import { Send } from "@lucide/svelte";
-    import instance from "$lib/stores/ProjectStore.svelte";
+  import type { NoteAttachment } from "$lib/representation/note";
+  import instance from "$lib/stores/ProjectStore.svelte";
+  import { Paperclip, Send, X } from "@lucide/svelte";
 
-    let props: {
-        projectId: string;
-    } = $props();
+  let props: { projectId: string } = $props();
+  let newNoteText = $state("");
+  let timeFrom = $state("");
+  let timeTo = $state("");
+  let pendingAttachments = $state<NoteAttachment[]>([]);
+  let fileInput = $state<HTMLInputElement | null>(null);
 
-    let newNoteText = $state("");
-    let timeFrom = $state("");
-    let timeTo = $state("");
-
-    const livePreviewSpan = $derived.by(() => {
-        if (!timeFrom || !timeTo) {
-            return ""
-        };
-
-        const [fromHours, fromMinutes] = timeFrom.split(":").map(Number);
-        const [toHours, toMinutes] = timeTo.split(":").map(Number);
-        
-        let diff = toHours * 60 + toMinutes - (fromHours * 60 + fromMinutes);
-
-        if (diff < 0) {
-            diff += 24 * 60;
-        }
-
-        const hours = Math.floor(diff / 60);
-        const minutes = diff % 60;
-
-        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-    });
-
-    function sendNote() {
-        if (!newNoteText.trim()) {
-            return;
-        }
-
-        instance.addNote(props.projectId, newNoteText, timeFrom, timeTo);
-
-        newNoteText = "";
-        timeFrom = "";
-        timeTo = "";
+  const livePreviewSpan = $derived.by(() => {
+    if (!timeFrom || !timeTo) {
+      return "";
     }
 
-    function handleKeyDown(e: KeyboardEvent) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendNote();
-        }
+    const [fh, fm] = timeFrom.split(":").map(Number);
+    const [th, tm] = timeTo.split(":").map(Number);
+
+    let diff = th * 60 + tm - (fh * 60 + fm);
+
+    if (diff < 0) {
+      diff += 24 * 60;
     }
+
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  });
+
+  const canSend = $derived(
+    newNoteText.trim().length > 0 || pendingAttachments.length > 0,
+  );
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function onFilesSelected(e: Event) {
+    const files = (e.target as HTMLInputElement).files;
+    if (!files?.length) return;
+
+    const added: NoteAttachment[] = [];
+    for (const file of files) {
+      added.push({ name: file.name, size: file.size });
+    }
+    pendingAttachments = [...pendingAttachments, ...added];
+    (e.target as HTMLInputElement).value = "";
+  }
+
+  function removeAttachment(index: number) {
+    pendingAttachments = pendingAttachments.filter((_, i) => i !== index);
+  }
+
+  function sendNote() {
+    if (!canSend) {
+      return;
+    }
+
+    instance.addNote(
+      props.projectId,
+      newNoteText,
+      timeFrom,
+      timeTo,
+      pendingAttachments,
+    );
+    newNoteText = "";
+    timeFrom = "";
+    timeTo = "";
+    pendingAttachments = [];
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendNote();
+    }
+  }
 </script>
 
-<div
-    class="w-full bg-gray-100/80 border border-gray-200/50 p-3 rounded-xl flex flex-col gap-2"
->
-    <div class="flex gap-2 items-end w-full">
-        <textarea
-            rows="1"
-            placeholder="Send note..."
-            bind:value={newNoteText}
-            onkeydown={handleKeyDown}
-            class="w-full text-sm border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white resize-none max-h-32 min-h-[38px]"
-        ></textarea>
+<div class="island w-full p-3 flex flex-col gap-2">
+  <textarea
+    rows="3"
+    placeholder="Write a note… (Enter to send, Shift+Enter for newline)"
+    bind:value={newNoteText}
+    onkeydown={handleKeyDown}
+    class="w-full py-2.5 px-3 text-sm leading-relaxed resize-none input-field min-h-18 max-h-40 text-tx-dim focus:text-tx">
+  </textarea>
 
-        <div
-            class="flex grow items-center gap-4 text-xs text-gray-500 bg-white border border-gray-200/40 p-2 rounded-lg w-fit shadow-sm shrink-0"
-        >
-            <div class="flex items-center gap-1.5">
-                <span>From:</span>
-                <input
-                    type="time"
-                    bind:value={timeFrom}
-                    class="bg-gray-50 border border-gray-200 rounded px-1 py-0.5 font-mono"
-                />
-            </div>
-
-            <div class="flex items-center gap-1.5">
-                <span>To:</span>
-                <input
-                    type="time"
-                    bind:value={timeTo}
-                    class="bg-gray-50 border border-gray-200 rounded px-1 py-0.5 font-mono"
-                />
-            </div>
-
-            {#if livePreviewSpan}
-                <span class="text-emerald-600 font-bold px-1 font-mono"
-                    >{livePreviewSpan}</span
-                >
-            {/if}
-        </div>
-
-        <button
-            onclick={sendNote}
-            class="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg h-[38px] w-[38px] shrink-0 flex items-center justify-center"
-        >
-            <Send class="w-4 h-4" />
-        </button>
+  {#if pendingAttachments.length > 0}
+    <div class="flex flex-wrap gap-1.5 px-0.5">
+      {#each pendingAttachments as file, i (file.name + i)}
+        <span
+          class="inline-flex items-center gap-1 max-w-48 pl-2 pr-1 py-0.5 rounded-md
+                 bg-s2 border border-bd-dim text-xs text-tx-dim">
+          <Paperclip class="w-3 h-3 shrink-0 text-tx-faint" />
+          <span class="truncate font-mono">
+            {file.name}
+          </span>
+          <span class="text-tx-faint shrink-0">
+            {formatFileSize(file.size)}
+          </span>
+          <button
+            type="button"
+            title="Remove"
+            onclick={() => removeAttachment(i)}
+            class="p-0.5 rounded hover:bg-s3 text-tx-faint hover:text-tx transition-colors">
+            <X class="w-3 h-3" />
+          </button>
+        </span>
+      {/each}
     </div>
+  {/if}
+
+  <div
+    class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-bd-dim">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs text-tx-faint">From</span>
+        <input
+          type="time"
+          bind:value={timeFrom}
+          class="px-1.5 py-1 font-mono text-xs input-field" />
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs text-tx-faint">To</span>
+        <input
+          type="time"
+          bind:value={timeTo}
+          class="px-1.5 py-1 font-mono text-xs input-field" />
+      </div>
+      {#if livePreviewSpan}
+        <span class="font-semibold font-mono text-xs text-ac-br">
+          {livePreviewSpan}
+        </span>
+      {/if}
+    </div>
+
+    <div class="flex items-center gap-1.5 shrink-0">
+      <input
+        bind:this={fileInput}
+        type="file"
+        multiple
+        class="sr-only"
+        onchange={onFilesSelected} />
+      <button
+        type="button"
+        title="Attach file"
+        onclick={() => fileInput?.click()}
+        class="h-9 w-9 flex items-center justify-center rounded-lg cursor-pointer
+               border border-bd bg-s2 text-tx-faint
+               hover:text-tx hover:border-bd-str hover:bg-s3 transition-colors">
+        <Paperclip class="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onclick={sendNote}
+        disabled={!canSend}
+        class="h-9 px-4 flex items-center justify-center gap-1.5 rounded-lg cursor-pointer btn-primary text-sm
+               disabled:opacity-40 disabled:cursor-not-allowed">
+        <Send class="w-4 h-4" />
+        Send
+      </button>
+    </div>
+  </div>
 </div>

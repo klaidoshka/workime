@@ -1,1 +1,143 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&display=swap');
+
+@theme {
+  --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  /* Surfaces */
+  --color-s0: #121212;
+  --color-s1: #1c1c1c;
+  --color-s2: #242424;
+  --color-s3: #2a2a2a;
+  --color-s4: #333333;
+
+  /* Borders */
+  --color-bd-dim: #262626;
+  --color-bd: #333333;
+  --color-bd-str: #404040;
+
+  /* Text */
+  --color-tx: #ffffff;
+  --color-tx-dim: #a0a0a0;
+  --color-tx-faint: #6b6b6b;
+
+  /* Primary accent */
+  --color-ac: #d97b5f;
+  --color-ac-br: #e68a6e;
+  --color-ac-bg: color-mix(in srgb, #e68a6e 14%, transparent);
+  --color-ac-bd: color-mix(in srgb, #e68a6e 38%, transparent);
+
+  /* Alias */
+  --color-hl: #d97b5f;
+  --color-hl-br: #e68a6e;
+  --color-hl-bg: color-mix(in srgb, #e68a6e 14%, transparent);
+  --color-hl-bd: color-mix(in srgb, #e68a6e 38%, transparent);
+
+  /* Positive / time */
+  --color-ok: #7a9e8a;
+  --color-ok-br: #8fad9c;
+  --color-ok-bg: color-mix(in srgb, #8fad9c 12%, transparent);
+  --color-ok-bd: color-mix(in srgb, #8fad9c 28%, transparent);
+
+  /* Warning & error */
+  --color-warn: #c9a227;
+  --color-warn-br: #d4ad3a;
+  --color-warn-bg: color-mix(in srgb, #c9a227 12%, transparent);
+  --color-warn-bd: color-mix(in srgb, #c9a227 30%, transparent);
+
+  --color-err: #c75c5c;
+  --color-err-br: #d46a6a;
+  --color-err-bg: color-mix(in srgb, #c75c5c 12%, transparent);
+  --color-err-bd: color-mix(in srgb, #c75c5c 30%, transparent);
+}
+
+@layer components {
+  .island {
+    @apply rounded-[1.25rem] border border-bd-dim bg-s1 shadow-[0_4px_24px_rgba(0,0,0,0.35)];
+  }
+
+  .section-label {
+    @apply text-[10px] font-semibold uppercase tracking-widest text-tx-faint;
+  }
+
+  .metric-label {
+    @apply text-[10px] font-semibold uppercase tracking-wide text-tx-faint;
+  }
+
+  .metric-tile {
+    @apply flex min-w-0 flex-col gap-2 rounded-[0.875rem] bg-s2/55 p-4 px-4.5;
+  }
+
+  .stat-sheet {
+    @apply overflow-hidden rounded-[0.875rem] bg-s2/45;
+  }
+
+  .stat-row {
+    @apply flex items-center justify-between gap-4 border-b border-bd-dim px-4.5 py-3.5;
+  }
+
+  .stat-row:last-child {
+    @apply border-b-0;
+  }
+
+  .input-budget {
+    @apply w-13 border-0 border-b border-bd bg-transparent px-0 pb-0.5 font-mono text-sm font-semibold leading-tight text-tx transition-colors placeholder:text-tx-faint focus:outline-none focus:border-b-ac-br;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .input-budget::-webkit-inner-spin-button,
+  .input-budget::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .scratch-editor {
+    @apply min-h-0 w-full flex-1 resize-none border-0 bg-transparent px-4 py-3.5 text-sm leading-relaxed text-tx-dim placeholder:text-tx-faint focus:outline-none focus:text-tx;
+  }
+
+  .btn-primary {
+    @apply rounded-lg bg-ac-br font-semibold text-s0 transition-colors hover:bg-ac;
+  }
+
+  .timeline-rail {
+    @apply border-l-2 border-bd-str;
+  }
+
+  .input-field {
+    @apply rounded-xl border border-bd bg-s3 text-tx transition-[border-color,box-shadow] placeholder:text-tx-faint focus:border-ac-br focus:shadow-[0_0_0_3px_var(--color-ac-bg)] focus:outline-none;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-s0 font-sans text-tx;
+  }
+}
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    @apply h-1.5 w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-s0;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-bd-str hover:bg-ac;
+  }
+
+  input[type='time']::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    opacity: 0.35;
+    filter: invert(1);
+  }
+}
