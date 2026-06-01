@@ -42,8 +42,13 @@
   }
 
   function handleBlur(target: "from" | "to") {
-    if (target === "from") timeFrom = autocompleteTime(timeFrom);
-    if (target === "to") timeTo = autocompleteTime(timeTo);
+    if (target === "from") {
+      timeFrom = autocompleteTime(timeFrom);
+    }
+
+    if (target === "to") {
+      timeTo = autocompleteTime(timeTo);
+    }
 
     const start = TimeUtils.stringToMinutes(timeFrom);
     const end = TimeUtils.stringToMinutes(timeTo);

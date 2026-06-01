@@ -23,6 +23,7 @@
       {project.label}
     </span>
   </button>
+
   <button
     type="button"
     class="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded transition-all z-10

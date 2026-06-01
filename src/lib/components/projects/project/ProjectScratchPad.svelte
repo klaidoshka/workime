@@ -13,8 +13,6 @@
   const charCount = $derived(text.length);
 
   $effect(() => {
-    const id = props.project.id;
-    void id;
     text = props.project.scratchPad ?? "";
     saveState = "saved";
   });
@@ -36,7 +34,10 @@
 
   function insertAtCursor(prefix: string, suffix = "") {
     const el = textareaEl;
-    if (!el) return;
+
+    if (!el) {
+      return;
+    }
 
     const start = el.selectionStart;
     const end = el.selectionEnd;

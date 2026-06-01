@@ -3,7 +3,7 @@
   import ProjectNotes from "$lib/components/projects/project/ProjectNotes.svelte";
   import ProjectScratchPad from "$lib/components/projects/project/ProjectScratchPad.svelte";
   import SendNote from "$lib/components/projects/project/SendNote.svelte";
-  import ProjectStats from "$lib/components/projects/project/Stats/ProjectStats.svelte";
+  import ProjectStats from "$lib/components/projects/project/stats/ProjectStats.svelte";
   import instance from "$lib/stores/ProjectStore.svelte";
 
   let noteSearch = $state("");

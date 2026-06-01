@@ -1,8 +1,8 @@
 <script lang="ts">
+  import TimeRangePicker from "$lib/components/common/timeRangePicker/TimeRangePicker.svelte";
   import type { NoteAttachment } from "$lib/representation/note";
   import instance from "$lib/stores/ProjectStore.svelte";
   import { Paperclip, Send, X } from "@lucide/svelte";
-  import TimeRangePicker from "../../common/TimeRangePicker/TimeRangePicker.svelte";
 
   let props: { projectId: string } = $props();
 

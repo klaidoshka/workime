@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProjectSiderbar from "$lib/components/projects/ProjectSiderbar.svelte";
+  import ProjectSiderbar from "$lib/components/projects/ProjectSidebar.svelte";
 
   let { children } = $props();
 </script>
