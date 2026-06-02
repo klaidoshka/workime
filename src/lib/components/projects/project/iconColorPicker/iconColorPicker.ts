@@ -58,12 +58,20 @@ export const PROJECT_COLORS = [
   { id: 'slate', value: '#64748b' },
 ] as const;
 
-export type ProjectColorId = typeof PROJECT_COLORS[number]['id'];
+export type ProjectColorId = typeof PROJECT_COLORS[number]['id'] | string;
 
 export const DEFAULT_ICON: ProjectIconName = 'Folder';
 export const DEFAULT_COLOR = 'coral';
 
 export function getColorValue(colorId?: string): string {
+  if (!colorId) {
+    return '#3b82f6';
+  }
+
+  if (colorId.startsWith('#')) {
+    return colorId;
+  }
+
   return PROJECT_COLORS.find(c => c.id === colorId)?.value ?? '#3b82f6';
 }
 
