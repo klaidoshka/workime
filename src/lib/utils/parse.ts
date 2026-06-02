@@ -7,7 +7,7 @@ class ParseUtils {
             ...value,
             createdAt: new Date(value.created_at),
             modifiedAt: value.modified_at ? new Date(value.modified_at) : undefined,
-            expectedFinishHours: value.expected_finish_hours,
+            expectedCompletionHours: value.expected_completion_hours,
             scratchPad: value.scratch_pad
         };
     }

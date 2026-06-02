@@ -22,8 +22,8 @@ pub struct Project {
     pub label: String,
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
-    pub finished: bool,
+    pub completed: bool,
     pub pinned: bool,
     pub scratch_pad: Option<String>,
-    pub expected_finish_hours: Option<i32>,
+    pub expected_completion_hours: Option<i32>,
 }

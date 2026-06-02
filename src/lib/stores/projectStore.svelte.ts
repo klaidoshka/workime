@@ -127,11 +127,11 @@ class ProjectStore {
         }
     }
 
-    toggleProjectFinished(id: number) {
+    toggleProjectCompleted(id: number) {
         const project = this.projects.find(p => p.id === id);
 
         if (project) {
-            project.finished = !project.finished;
+            project.completed = !project.completed;
             project.modifiedAt = new Date();
         }
     }
@@ -148,7 +148,7 @@ class ProjectStore {
         const project = this.projects.find(p => p.id === id);
 
         if (project) {
-            project.expectedFinishHours = hours;
+            project.expectedCompletionHours = hours;
             project.modifiedAt = new Date();
         }
     }

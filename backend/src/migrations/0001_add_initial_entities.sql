@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS projects (
     label TEXT NOT NULL,
     created_at DATETIME NOT NULL,
     modified_at DATETIME,
-    finished BOOLEAN NOT NULL DEFAULT 0,
+    completed BOOLEAN NOT NULL DEFAULT 0,
     pinned BOOLEAN NOT NULL DEFAULT 0,
     scratch_pad TEXT,
-    expected_finish_hours INTEGER
+    expected_completion_hours INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS project_notes (

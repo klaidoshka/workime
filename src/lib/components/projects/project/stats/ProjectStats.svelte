@@ -54,7 +54,7 @@
   <header class="flex flex-col gap-1">
     <h2 class="section-label">Time Dashboard</h2>
     <p class="text-xs text-tx-faint leading-relaxed">
-      {props.project.finished ? "Completed project" : "Active project"} · {stats.noteCount}
+      {props.project.completed ? "Completed project" : "Active project"} · {stats.noteCount}
       {stats.noteCount === 1 ? "note" : "notes"}
     </p>
   </header>

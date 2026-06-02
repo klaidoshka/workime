@@ -26,13 +26,13 @@ export function calculateDashboardStats(project: Project, notes: Note[]) {
 
   if (project) {
     const start = new Date(project.createdAt).getTime();
-    const end = project.finished ? new Date(project.modifiedAt || project.createdAt).getTime() : Date.now();
+    const end = project.completed ? new Date(project.modifiedAt || project.createdAt).getTime() : Date.now();
 
     daysActive = Math.max(1, Math.ceil(Math.max(0, end - start) / 86_400_000));
   }
 
   const dailyAvgMinutes = Math.round(totalMinutes / daysActive);
-  const targetHours = project.expectedFinishHours ?? 0;
+  const targetHours = project.expectedCompletionHours ?? 0;
   const loggedHours = totalMinutes / 60;
   const progressPercentage = targetHours > 0 ? Math.max(0, Math.round((loggedHours / targetHours) * 100)) : 0;
   const remainingHours = Math.max(0, targetHours - loggedHours);

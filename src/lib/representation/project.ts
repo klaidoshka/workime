@@ -3,8 +3,8 @@ export interface Project {
   label: string;
   createdAt: Date;
   modifiedAt?: Date;
-  finished: boolean;
+  completed: boolean;
   pinned: boolean;
   scratchPad?: string;
-  expectedFinishHours?: number;
+  expectedCompletionHours?: number;
 };

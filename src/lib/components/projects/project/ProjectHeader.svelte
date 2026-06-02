@@ -20,12 +20,12 @@
     </h1>
     <button
       type="button"
-      onclick={() => instance.toggleProjectFinished(props.project.id)}
+      onclick={() => instance.toggleProjectCompleted(props.project.id)}
       class="cursor-pointer select-none rounded-full text-xs font-semibold px-2.5 py-0.5 transition-all
-             {props.project.finished
+             {props.project.completed
         ? 'bg-s3 text-tx-dim border border-bd'
         : 'bg-ac-br text-s0 border border-transparent hover:bg-ac'}">
-      {props.project.finished ? "Completed" : "Active"}
+      {props.project.completed ? "Completed" : "Active"}
     </button>
   </div>
   <div class="relative w-60">
