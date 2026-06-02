@@ -59,14 +59,6 @@ class ProjectStore {
     });
   }
 
-  togglePin(id: number) {
-    const project = this.#projects.find(p => p.id === id);
-
-    if (project) {
-      project.pinned = !project.pinned;
-    }
-  }
-
   async addNote(
     projectId: number,
     content: string,
@@ -91,13 +83,12 @@ class ProjectStore {
       tags,
       timeTakenFrom: timeFrom ? timeFrom.toISOString() : undefined,
       timeTakenTo: timeTo ? timeTo.toISOString() : undefined,
-      // attachments: attachments.length ? attachments : undefined,
     }).then(r => {
       const note = ParseUtils.parseNote(r.value);
-      const targetProject = this.projects.find(p => p.id === projectId);
+      const project = this.projects.find(p => p.id === projectId);
 
-      if (targetProject) {
-        targetProject.modifiedAt = new Date(note.createdAt);
+      if (project) {
+        project.modifiedAt = new Date(note.createdAt);
       }
 
       if (!this.#notes[projectId]) {
@@ -110,29 +101,75 @@ class ProjectStore {
     });
   }
 
-  toggleProjectCompleted(id: number) {
-    const project = this.projects.find(p => p.id === id);
+  togglePin(id: number) {
+    const project = this.#projects.find(p => p.id === id);
 
     if (project) {
-      project.completed = !project.completed;
-      project.modifiedAt = new Date();
+      invokeBridge<Project>("edit_project", {
+        id,
+        pinned: !project.pinned,
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.pinned = parsed.pinned;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
+    }
+  }
+
+  toggleProjectCompleted(id: number) {
+    const project = this.#projects.find(p => p.id === id);
+
+    if (project) {
+      invokeBridge<Project>("edit_project", {
+        id,
+        completed: !project.completed,
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.completed = parsed.completed;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
     }
   }
 
   updateScratchpad(id: number, text: string) {
-    const project = this.projects.find(p => p.id === id);
+    const project = this.#projects.find(p => p.id === id);
 
     if (project) {
-      project.scratchPad = text;
+      invokeBridge<Project>("edit_project", {
+        id,
+        scratchPad: text.trim(),
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.scratchPad = parsed.scratchPad;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
     }
   }
 
   updateExpectedHours(id: number, hours: number) {
-    const project = this.projects.find(p => p.id === id);
+    const project = this.#projects.find(p => p.id === id);
 
-    if (project) {
-      project.expectedCompletionHours = hours;
-      project.modifiedAt = new Date();
+    if (project && hours >= 0) {
+      invokeBridge<Project>("edit_project", {
+        id,
+        expectedCompletionHours: hours,
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.expectedCompletionHours = parsed.expectedCompletionHours;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
     }
   }
 }

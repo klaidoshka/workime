@@ -25,6 +25,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             cmd::project::create_project,
             cmd::project::create_project_note,
+            cmd::project::edit_project,
             query::project::query_projects,
             query::project::query_project_notes
         ])
