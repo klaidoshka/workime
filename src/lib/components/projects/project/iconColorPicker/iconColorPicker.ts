@@ -80,10 +80,6 @@ export function getIconComponent(iconName?: string) {
   return ICON_MAP[(iconName as ProjectIconName) ?? DEFAULT_ICON] ?? Folder;
 }
 
-export function randomColor(): string {
-  return PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)].id;
-}
-
 export function getProjectIconAndColor(project: Project) {
   const iconKey = (project.icon ?? DEFAULT_ICON) as ProjectIconName;
   const IconComp = ICON_MAP[iconKey] ?? ICON_MAP[DEFAULT_ICON];
