@@ -1,12 +1,10 @@
 class TimeUtils {
-  static stringToMinutes(timeStr: string): number | undefined {
-    if (!timeStr) {
-      return undefined;
+  static dateToMinutes(date: Date): number {
+    if (!date) {
+      return 0;
     }
 
-    const [hours, minutes] = timeStr.split(":").map(Number);
-
-    return hours * 60 + minutes;
+    return date.getHours() * 60 + date.getMinutes();
   }
 
   static formatMinutes(totalMinutes: number): string {

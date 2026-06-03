@@ -1,12 +1,11 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { Search } from "@lucide/svelte";
   import ProjectCard from "./ProjectCard.svelte";
 
   let projectSearch = $state("");
-
   let isCreating = $state(false);
   let newName = $state("");
 
@@ -17,7 +16,10 @@
   );
 
   $effect(() => {
-    if (instance.selectedId && page.params.slug !== instance.selectedId) {
+    if (
+      instance.selectedId &&
+      page.params.slug !== instance.selectedId?.toString()
+    ) {
       goto(`/projects/${instance.selectedId}`, { replaceState: true });
     }
   });
@@ -27,14 +29,17 @@
   }
 
   function submitProject() {
-    const trimmed = newName.trim();
-    if (trimmed) {
-      const newId = instance.add(trimmed);
+    const trimmedName = newName.trim();
 
-      if (newId) {
-        instance.selectedId = newId;
-      }
+    if (trimmedName) {
+      instance.add(trimmedName).then((id) => {
+        instance.selectedId = id;
+        cancelCreation();
+      });
+
+      return;
     }
+
     cancelCreation();
   }
 
@@ -60,13 +65,15 @@
       placeholder="Search projects…"
       bind:value={projectSearch}
       class="w-full py-1.5 pl-8 pr-2 text-sm input-field"
-      disabled={isCreating} />
+      disabled={isCreating}
+    />
   </div>
 
   <div class="flex flex-col gap-0.5 overflow-y-auto flex-1 min-h-0 mt-3 pr-0.5">
     {#if isCreating}
       <div
-        class="w-full p-2 text-sm flex items-center rounded-xl border border-dashed border-ac-bd bg-s2/40">
+        class="w-full p-2 text-sm flex items-center rounded-xl border border-dashed border-ac-bd bg-s2/40"
+      >
         <div class="flex-1 min-w-0 pl-0.5">
           <input
             use:focusOnMount
@@ -75,7 +82,8 @@
             bind:value={newName}
             onkeydown={handleKeyDown}
             onblur={submitProject}
-            class="w-full bg-transparent border-0 p-0 text-sm font-medium text-tx placeholder:text-tx-faint focus:outline-none focus:ring-0" />
+            class="w-full bg-transparent border-0 p-0 text-sm font-medium text-tx placeholder:text-tx-faint focus:outline-none focus:ring-0"
+          />
         </div>
       </div>
     {/if}
@@ -92,7 +100,8 @@
            text-sm font-medium text-tx-faint text-center
            disabled:opacity-40 disabled:cursor-not-allowed
            hover:border-ac-bd hover:text-ac-br hover:bg-s2
-           transition-[border-color,color,background-color,opacity] duration-150">
+           transition-[border-color,color,background-color,opacity] duration-150"
+  >
     {isCreating ? "Naming project..." : "+ New Project"}
   </button>
 </div>

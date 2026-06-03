@@ -8,7 +8,7 @@ export function calculateDashboardStats(project: Project, notes: Note[]) {
 
   notes.forEach((n) => {
     if (n.timeTakenFrom !== undefined && n.timeTakenTo !== undefined) {
-      let diff = n.timeTakenTo - n.timeTakenFrom;
+      let diff = TimeUtils.dateToMinutes(n.timeTakenTo) - TimeUtils.dateToMinutes(n.timeTakenFrom);
 
       if (diff < 0) {
         diff += 24 * 60;
@@ -26,21 +26,21 @@ export function calculateDashboardStats(project: Project, notes: Note[]) {
 
   if (project) {
     const start = new Date(project.createdAt).getTime();
-    const end = project.finished ? new Date(project.modifiedAt).getTime() : Date.now();
+    const end = project.completed ? new Date(project.modifiedAt || project.createdAt).getTime() : Date.now();
+
     daysActive = Math.max(1, Math.ceil(Math.max(0, end - start) / 86_400_000));
   }
 
   const dailyAvgMinutes = Math.round(totalMinutes / daysActive);
-  const targetHours = project.expectedFinishHours ?? 0;
+  const targetHours = project.expectedCompletionHours ?? 0;
   const loggedHours = totalMinutes / 60;
-
   const progressPercentage = targetHours > 0 ? Math.max(0, Math.round((loggedHours / targetHours) * 100)) : 0;
   const remainingHours = Math.max(0, targetHours - loggedHours);
   const remainingFormatted = remainingHours >= 1 ? `${remainingHours.toFixed(1)}h` : `${Math.round(remainingHours * 60)}m`;
 
   const lastActivity = notes.length
-    ? new Date(Math.max(...notes.map((n) => n.timestamp.getTime())))
-    : new Date(project.modifiedAt);
+    ? new Date(Math.max(...notes.map((n) => n.createdAt.getTime())))
+    : new Date(project.modifiedAt || project.createdAt);
 
   return {
     totalFormatted: TimeUtils.formatMinutes(totalMinutes),

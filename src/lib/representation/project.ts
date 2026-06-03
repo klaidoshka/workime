@@ -1,10 +1,10 @@
 export interface Project {
-  id: string;
+  id: number;
   label: string;
   createdAt: Date;
-  modifiedAt: Date;
-  finished: boolean;
+  modifiedAt?: Date;
+  completed: boolean;
   pinned: boolean;
   scratchPad?: string;
-  expectedFinishHours?: number;
+  expectedCompletionHours?: number;
 };

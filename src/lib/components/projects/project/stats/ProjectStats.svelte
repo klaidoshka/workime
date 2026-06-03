@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Note } from "$lib/representation/note";
   import type { Project } from "$lib/representation/project";
-  import instance from "$lib/stores/ProjectStore.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import { calculateDashboardStats } from "./ProjectStats";
 
   let props: { project: Project; notes: Note[] } = $props();
@@ -54,7 +54,7 @@
   <header class="flex flex-col gap-1">
     <h2 class="section-label">Time Dashboard</h2>
     <p class="text-xs text-tx-faint leading-relaxed">
-      {props.project.finished ? "Completed project" : "Active project"} · {stats.noteCount}
+      {props.project.completed ? "Completed project" : "Active project"} · {stats.noteCount}
       {stats.noteCount === 1 ? "note" : "notes"}
     </p>
   </header>
