@@ -1,40 +1,40 @@
 use crate::{
-    application::ApplicationState,
-    cmd::{AsBridgeResponse, BridgeResponse},
-    entity::{Note, Project},
+  application::ApplicationState,
+  cmd::{AsBridgeResponse, BridgeResponse},
+  entity::{Note, Project},
 };
 use chrono::Utc;
 use tauri::State;
 
 #[tauri::command]
 pub async fn create_project(
-    state: State<'_, ApplicationState>,
-    label: String,
+  state: State<'_, ApplicationState>,
+  label: String,
 ) -> BridgeResponse<Project> {
-    let app = state.lock().await;
+  let app = state.lock().await;
 
-    sqlx::query_as::<_, Project>(
-        "INSERT INTO projects (label, created_at) VALUES ($1, $2) RETURNING *",
-    )
-    .bind(label)
-    .bind(Utc::now())
-    .fetch_one(app.pool())
-    .await
-    .as_bridge_response()
+  sqlx::query_as::<_, Project>(
+    "INSERT INTO projects (label, created_at) VALUES ($1, $2) RETURNING *",
+  )
+  .bind(label)
+  .bind(Utc::now())
+  .fetch_one(app.pool())
+  .await
+  .as_bridge_response()
 }
 
 #[tauri::command]
 pub async fn create_project_note(
-    state: State<'_, ApplicationState>,
-    project_id: i32,
-    content: String,
-    tags: Vec<String>,
-    time_taken_from: Option<String>,
-    time_taken_to: Option<String>,
+  state: State<'_, ApplicationState>,
+  project_id: i32,
+  content: String,
+  tags: Vec<String>,
+  time_taken_from: Option<String>,
+  time_taken_to: Option<String>,
 ) -> BridgeResponse<Note> {
-    let app = state.lock().await;
+  let app = state.lock().await;
 
-    sqlx::query_as::<_, Note>(
+  sqlx::query_as::<_, Note>(
         "INSERT INTO project_notes (project_id, created_at, content, tags, time_taken_from, time_taken_to)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *"
@@ -52,17 +52,17 @@ pub async fn create_project_note(
 
 #[tauri::command]
 pub async fn edit_project(
-    state: State<'_, ApplicationState>,
-    id: i32,
-    pinned: Option<bool>,
-    completed: Option<bool>,
-    scratch_pad: Option<String>,
-    expected_completion_hours: Option<i32>,
+  state: State<'_, ApplicationState>,
+  id: i32,
+  pinned: Option<bool>,
+  completed: Option<bool>,
+  scratch_pad: Option<String>,
+  expected_completion_hours: Option<i32>,
 ) -> BridgeResponse<Project> {
-    let app = state.lock().await;
+  let app = state.lock().await;
 
-    sqlx::query_as::<_, Project>(
-        r#"
+  sqlx::query_as::<_, Project>(
+    r#"
         UPDATE projects 
         SET 
             modified_at = $1, 
@@ -73,14 +73,14 @@ pub async fn edit_project(
         WHERE id = $6
         RETURNING *
         "#,
-    )
-    .bind(Utc::now())
-    .bind(pinned)
-    .bind(completed)
-    .bind(scratch_pad)
-    .bind(expected_completion_hours)
-    .bind(id)
-    .fetch_one(app.pool())
-    .await
-    .as_bridge_response()
+  )
+  .bind(Utc::now())
+  .bind(pinned)
+  .bind(completed)
+  .bind(scratch_pad)
+  .bind(expected_completion_hours)
+  .bind(id)
+  .fetch_one(app.pool())
+  .await
+  .as_bridge_response()
 }
