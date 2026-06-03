@@ -26,11 +26,15 @@
   });
 
   $effect(() => {
-    if (fromInputEl) fromInputEl.value = localFrom;
+    if (fromInputEl) {
+      fromInputEl.value = localFrom;
+    }
   });
 
   $effect(() => {
-    if (toInputEl) toInputEl.value = localTo;
+    if (toInputEl) {
+      toInputEl.value = localTo;
+    }
   });
 
   function handleInput(e: Event, target: "from" | "to") {
