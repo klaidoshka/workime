@@ -5,9 +5,7 @@
   import {
       DEFAULT_COLOR,
       DEFAULT_ICON,
-      ICON_MAP,
-      getColorValue,
-      type ProjectIconName,
+      getProjectIconAndColor,
   } from "./project/iconColorPicker/iconColorPicker";
   import IconColorPicker from "./project/iconColorPicker/IconColorPicker.svelte";
 
@@ -15,9 +13,7 @@
   let showPicker = $state(false);
   let triggerBtn: HTMLButtonElement = $state() as HTMLButtonElement;
 
-  const iconKey = $derived((project.icon ?? DEFAULT_ICON) as ProjectIconName);
-  const IconComp = $derived(ICON_MAP[iconKey] ?? ICON_MAP[DEFAULT_ICON]);
-  const colorValue = $derived(getColorValue(project.color ?? DEFAULT_COLOR));
+  const { IconComp, colorValue } = $derived(getProjectIconAndColor(project));
 
   let pickerPos = $state({ top: 0, left: 0 });
 

@@ -1,3 +1,4 @@
+import type { Project } from '$lib/representation/project';
 import {
   Activity,
   BarChart2, Bookmark, BookOpen, Box, Briefcase, Bug,
@@ -81,4 +82,12 @@ export function getIconComponent(iconName?: string) {
 
 export function randomColor(): string {
   return PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)].id;
+}
+
+export function getProjectIconAndColor(project: Project) {
+  const iconKey = (project.icon ?? DEFAULT_ICON) as ProjectIconName;
+  const IconComp = ICON_MAP[iconKey] ?? ICON_MAP[DEFAULT_ICON];
+  const colorValue = getColorValue(project.color ?? DEFAULT_COLOR);
+
+  return { iconKey, IconComp, colorValue };
 }
