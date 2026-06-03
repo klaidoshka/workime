@@ -99,11 +99,11 @@
           type="button"
           onclick={() => selectColor(c.id)}
           title={c.id}
-          class="w-5 h-5 rounded-full shrink-0 transition-transform duration-100 bg-(--c-bg) outline-offset-2
+          class="w-5 h-5 rounded-full shrink-0 transition-transform duration-100 outline-offset-2
                  {currentColor === c.id
-            ? 'scale-110 outline-2 outline-(--c-bg)'
+            ? 'scale-110 outline-2'
             : 'opacity-60 hover:opacity-100 hover:scale-110 outline-none'}"
-          style="--c-bg: {c.value}">
+          style="background-color: {c.value}; outline-color: {c.value};">
         </button>
       {/each}
     </div>
@@ -150,9 +150,9 @@
           title={name}
           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors duration-100 focus:outline-none
                  {currentIcon === name
-            ? 'text-white bg-(--icon-bg)'
+            ? 'text-white'
             : 'text-tx-dim hover:bg-s2 hover:text-tx'}"
-          style="--icon-bg: {currentHex}">
+          style={currentIcon === name ? `background-color: ${currentHex}` : ""}>
           <IconComp class="w-3.5 h-3.5" />
         </button>
       {/each}
@@ -167,20 +167,8 @@
   {#if showCustomPicker}
     <div
       data-custom-picker
-      class="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 z-50 rounded-xl border border-bd bg-s1 shadow-2xl p-2 flex flex-col gap-2 custom-picker-wrap"
-      style="
-        --cp-bg-color: #1c1c1c;
-        --cp-border-color: #333333;
-        --cp-text-color: #ffffff;
-        --cp-input-color: #2a2a2a;
-        --cp-button-hover-color: #333333;
-        --focus-color: #e68a6e;
-        --picker-height: 150px;
-        --picker-width: 160px;
-        --slider-width: 18px;
-        --picker-indicator-size: 8px;
-        --input-size: 18px;
-      ">
+      onclick={(e) => e.stopPropagation()}
+      class="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 z-50 rounded-xl border border-bd bg-s1 shadow-2xl p-2 flex flex-col gap-2 custom-picker-wrap color-picker-theme">
       <button
         type="button"
         onclick={() => (showCustomPicker = false)}
@@ -209,3 +197,19 @@
     </div>
   {/if}
 </div>
+
+<style>
+  :global(.color-picker-theme) {
+    --cp-bg-color: #1c1c1c;
+    --cp-border-color: #333333;
+    --cp-text-color: #ffffff;
+    --cp-input-color: #2a2a2a;
+    --cp-button-hover-color: #333333;
+    --focus-color: #e68a6e;
+    --picker-height: 150px;
+    --picker-width: 160px;
+    --slider-width: 18px;
+    --picker-indicator-size: 8px;
+    --input-size: 18px;
+  }
+</style>
