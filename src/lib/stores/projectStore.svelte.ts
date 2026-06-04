@@ -1,8 +1,9 @@
-import type { Note, NoteAttachment } from "../representation/note";
-import type { Project } from "../representation/project";
+import { invokeBridge } from "$lib/bridge";
+import { DEFAULT_COLOR, DEFAULT_ICON } from "$lib/constants/projects";
 import ParseUtils from "$lib/utils/parse";
 import TextUtils from "$lib/utils/text";
-import { invokeBridge } from "$lib/bridge";
+import type { Note, NoteAttachment } from "../representation/note";
+import type { Project } from "../representation/project";
 
 class ProjectStore {
   selectedId = $state<number | undefined>(undefined);
@@ -29,7 +30,9 @@ class ProjectStore {
 
   get projects() {
     return [...this.#projects].sort((a, b) => {
-      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+      if (a.pinned !== b.pinned) {
+        return a.pinned ? -1 : 1;
+      }
 
       return b.modifiedAt
         ? b.modifiedAt.getTime() - (
@@ -49,7 +52,11 @@ class ProjectStore {
   }
 
   async add(label: string): Promise<number> {
-    return invokeBridge<Project>("create_project", { label }).then(r => {
+    return invokeBridge<Project>("create_project", {
+      label,
+      icon: DEFAULT_ICON,
+      color: DEFAULT_COLOR
+    }).then(r => {
       const project = ParseUtils.parseProject(r.value);
 
       this.#projects.push(project);
@@ -99,6 +106,26 @@ class ProjectStore {
 
       return note.id;
     });
+  }
+
+  updateIconAndColor(id: number, icon: string, color: string) {
+    const project = this.#projects.find(p => p.id === id);
+
+    if (project) {
+      invokeBridge<Project>("edit_project", {
+        id,
+        icon,
+        color,
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.icon = parsed.icon;
+          project.color = parsed.color;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
+    }
   }
 
   togglePin(id: number) {

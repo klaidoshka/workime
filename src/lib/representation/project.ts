@@ -7,4 +7,6 @@ export interface Project {
   pinned: boolean;
   scratchPad?: string;
   expectedCompletionHours?: number;
+  icon?: string;
+  color?: string;
 };

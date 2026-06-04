@@ -2,6 +2,7 @@
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/projectStore.svelte";
   import { Search } from "@lucide/svelte";
+  import { getProjectIconAndColor } from "./iconColorPicker/IconColorPicker";
 
   let {
     noteSearch = $bindable(),
@@ -10,11 +11,20 @@
     noteSearch: string;
     project: Project;
   } = $props();
+
+  const { IconComp, colorValue } = $derived(
+    getProjectIconAndColor(props.project),
+  );
 </script>
 
 <div
   class="island w-full p-3 flex items-center justify-between animate-fade-in">
   <div class="flex items-center gap-3">
+    <div
+      class="shrink-0 w-6 h-6 rounded-md flex items-center justify-center"
+      style="background-color: {colorValue}20; color: {colorValue}">
+      <IconComp class="w-3.5 h-3.5" />
+    </div>
     <h1 class="text-lg font-semibold font-sans text-tx tracking-tight">
       {props.project.label}
     </h1>

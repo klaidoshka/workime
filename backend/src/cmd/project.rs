@@ -10,13 +10,17 @@ use tauri::State;
 pub async fn create_project(
   state: State<'_, ApplicationState>,
   label: String,
+  icon: String,
+  color: String,
 ) -> BridgeResponse<Project> {
   let app = state.lock().await;
 
   sqlx::query_as::<_, Project>(
-    "INSERT INTO projects (label, created_at) VALUES ($1, $2) RETURNING *",
+    "INSERT INTO projects (label, icon, color, created_at) VALUES ($1, $2, $3, $4) RETURNING *",
   )
   .bind(label)
+  .bind(icon)
+  .bind(color)
   .bind(Utc::now())
   .fetch_one(app.pool())
   .await
@@ -54,6 +58,8 @@ pub async fn create_project_note(
 pub async fn edit_project(
   state: State<'_, ApplicationState>,
   id: i32,
+  icon: Option<String>,
+  color: Option<String>,
   pinned: Option<bool>,
   completed: Option<bool>,
   scratch_pad: Option<String>,
@@ -63,18 +69,22 @@ pub async fn edit_project(
 
   sqlx::query_as::<_, Project>(
     r#"
-        UPDATE projects 
-        SET 
-            modified_at = $1, 
-            pinned = COALESCE($2, pinned), 
-            completed = COALESCE($3, completed), 
-            scratch_pad = COALESCE($4, scratch_pad), 
-            expected_completion_hours = COALESCE($5, expected_completion_hours) 
-        WHERE id = $6
+        UPDATE projects
+        SET
+            modified_at = $1,
+            icon = COALESCE($2, icon),
+            color = COALESCE($3, color),
+            pinned = COALESCE($4, pinned),
+            completed = COALESCE($5, completed),
+            scratch_pad = COALESCE($6, scratch_pad),
+            expected_completion_hours = COALESCE($7, expected_completion_hours)
+        WHERE id = $8
         RETURNING *
         "#,
   )
   .bind(Utc::now())
+  .bind(icon)
+  .bind(color)
   .bind(pinned)
   .bind(completed)
   .bind(scratch_pad)
