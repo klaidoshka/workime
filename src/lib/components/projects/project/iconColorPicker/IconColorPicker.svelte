@@ -1,17 +1,17 @@
 <script lang="ts">
+  import { DEFAULT_COLOR, DEFAULT_ICON } from "$lib/constants/projects";
   import { Search } from "@lucide/svelte";
   import ColorPicker from "svelte-awesome-color-picker";
   import {
-      DEFAULT_COLOR,
       ICON_MAP,
       PROJECT_COLORS,
       PROJECT_ICON_NAMES,
       type ProjectIconName,
       getColorValue,
-  } from "./iconColorPicker";
+  } from "./IconColorPicker";
 
   let {
-    icon = "Folder",
+    icon = DEFAULT_ICON,
     color = DEFAULT_COLOR,
     onchange,
     onclose,
@@ -61,19 +61,21 @@
 
   $effect(() => {
     function handler(e: MouseEvent) {
-      const t = e.target as HTMLElement;
+      const target = e.target as HTMLElement;
 
-      if (!document.contains(t)) return;
+      if (!document.contains(target)) {
+        return;
+      }
 
       if (
         showCustomPicker &&
-        !t.closest("[data-custom-picker]") &&
-        !t.closest("[data-custom-trigger]")
+        !target.closest("[data-custom-picker]") &&
+        !target.closest("[data-custom-trigger]")
       ) {
         showCustomPicker = false;
       }
 
-      if (!t.closest("[data-icon-color-picker]")) {
+      if (!target.closest("[data-icon-color-picker]")) {
         onclose?.();
       }
     }

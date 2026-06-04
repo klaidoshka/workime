@@ -2,7 +2,7 @@
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/projectStore.svelte";
   import { Search } from "@lucide/svelte";
-  import { getProjectIconAndColor } from "./iconColorPicker/iconColorPicker";
+  import { getProjectIconAndColor } from "./iconColorPicker/IconColorPicker";
 
   let {
     noteSearch = $bindable(),

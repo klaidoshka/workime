@@ -1,4 +1,5 @@
 import { invokeBridge } from "$lib/bridge";
+import { DEFAULT_COLOR, DEFAULT_ICON } from "$lib/constants/projects";
 import ParseUtils from "$lib/utils/parse";
 import TextUtils from "$lib/utils/text";
 import type { Note, NoteAttachment } from "../representation/note";
@@ -53,8 +54,8 @@ class ProjectStore {
   async add(label: string): Promise<number> {
     return invokeBridge<Project>("create_project", {
       label,
-      icon: 'Folder',
-      color: 'coral'
+      icon: DEFAULT_ICON,
+      color: DEFAULT_COLOR
     }).then(r => {
       const project = ParseUtils.parseProject(r.value);
 

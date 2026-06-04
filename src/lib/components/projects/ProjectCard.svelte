@@ -1,17 +1,14 @@
 <script lang="ts">
+  import { DEFAULT_COLOR, DEFAULT_ICON } from "$lib/constants/projects";
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/projectStore.svelte";
   import { Pin } from "@lucide/svelte";
-  import {
-      DEFAULT_COLOR,
-      DEFAULT_ICON,
-      getProjectIconAndColor,
-  } from "./project/iconColorPicker/iconColorPicker";
+  import { getProjectIconAndColor } from "./project/iconColorPicker/IconColorPicker";
   import IconColorPicker from "./project/iconColorPicker/IconColorPicker.svelte";
 
   let { project }: { project: Project } = $props();
   let showPicker = $state(false);
-  let triggerBtn: HTMLButtonElement = $state() as HTMLButtonElement;
+  let triggerBtn = $state() as HTMLButtonElement;
 
   const { IconComp, colorValue } = $derived(getProjectIconAndColor(project));
 
@@ -23,7 +20,9 @@
 
   function togglePicker(e: MouseEvent) {
     e.stopPropagation();
+
     const rect = triggerBtn.getBoundingClientRect();
+
     pickerPos = {
       top: rect.bottom + window.scrollY + 6,
       left: rect.left + window.scrollX,
@@ -33,6 +32,7 @@
 
   function portal(node: HTMLElement) {
     document.body.appendChild(node);
+
     return {
       destroy() {
         node.remove();
