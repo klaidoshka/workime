@@ -18,7 +18,7 @@
   let pickerPos = $state({ top: 0, left: 0 });
 
   function handleIconColorChange(icon: string, color: string) {
-    instance.update(project.id, { icon, color });
+    instance.updateIconAndColor(project.id, icon, color);
   }
 
   function togglePicker(e: MouseEvent) {

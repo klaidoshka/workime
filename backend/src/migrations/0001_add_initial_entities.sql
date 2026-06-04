@@ -3,6 +3,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS projects(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   label TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  color TEXT NOT NULL,
   created_at DATETIME NOT NULL,
   modified_at DATETIME,
   completed BOOLEAN NOT NULL DEFAULT (0),
