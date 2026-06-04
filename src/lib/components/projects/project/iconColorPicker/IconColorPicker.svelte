@@ -194,7 +194,9 @@
         textInputModes={["hex"]}
         position="responsive"
         onInput={(e) => {
-          if (e.hex) selectColor(e.hex);
+          if (e.hex) {
+            selectColor(e.hex);
+          }
         }} />
     </div>
   {/if}
