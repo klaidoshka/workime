@@ -128,6 +128,24 @@ class ProjectStore {
     }
   }
 
+  updateLabel(id: number, label: string) {
+    const project = this.#projects.find(p => p.id === id);
+
+    if (project) {
+      invokeBridge<Project>("edit_project", {
+        id,
+        label: label.trim(),
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.label = parsed.label;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
+    }
+  }
+
   togglePin(id: number) {
     const project = this.#projects.find(p => p.id === id);
 
@@ -195,6 +213,25 @@ class ProjectStore {
 
           project.expectedCompletionHours = parsed.expectedCompletionHours;
           project.modifiedAt = parsed.modifiedAt;
+        }
+      });
+    }
+  }
+
+  async delete(id: number) {
+    const projectIndex = this.#projects.findIndex(p => p.id === id);
+
+    if (projectIndex !== -1) {
+      await invokeBridge<void>("delete_project", { id }).then(() => {
+        delete this.#notes[id];
+        this.#projects.splice(projectIndex, 1);
+
+        if (this.selectedId === id) {
+          if (this.projects.length > 0) {
+            this.selectedId = this.projects[0].id;
+          } else {
+            this.selectedId = undefined;
+          }
         }
       });
     }

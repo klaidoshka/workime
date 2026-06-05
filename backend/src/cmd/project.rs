@@ -58,6 +58,7 @@ pub async fn create_project_note(
 pub async fn edit_project(
   state: State<'_, ApplicationState>,
   id: i32,
+  label: Option<String>,
   icon: Option<String>,
   color: Option<String>,
   pinned: Option<bool>,
@@ -72,17 +73,19 @@ pub async fn edit_project(
         UPDATE projects
         SET
             modified_at = $1,
-            icon = COALESCE($2, icon),
-            color = COALESCE($3, color),
-            pinned = COALESCE($4, pinned),
-            completed = COALESCE($5, completed),
-            scratch_pad = COALESCE($6, scratch_pad),
-            expected_completion_hours = COALESCE($7, expected_completion_hours)
-        WHERE id = $8
+            label = COALESCE($2, label),
+            icon = COALESCE($3, icon),
+            color = COALESCE($4, color),
+            pinned = COALESCE($5, pinned),
+            completed = COALESCE($6, completed),
+            scratch_pad = COALESCE($7, scratch_pad),
+            expected_completion_hours = COALESCE($8, expected_completion_hours)
+        WHERE id = $9
         RETURNING *
         "#,
   )
   .bind(Utc::now())
+  .bind(label)
   .bind(icon)
   .bind(color)
   .bind(pinned)
@@ -93,4 +96,16 @@ pub async fn edit_project(
   .fetch_one(app.pool())
   .await
   .as_bridge_response()
+}
+
+#[tauri::command]
+pub async fn delete_project(state: State<'_, ApplicationState>, id: i32) -> BridgeResponse<bool> {
+  let app = state.lock().await;
+
+  sqlx::query("DELETE FROM projects WHERE id = $1")
+    .bind(id)
+    .execute(app.pool())
+    .await
+    .map(|result| result.rows_affected() > 0)
+    .as_bridge_response()
 }

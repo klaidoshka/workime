@@ -26,6 +26,7 @@ pub fn run() {
       cmd::project::create_project,
       cmd::project::create_project_note,
       cmd::project::edit_project,
+      cmd::project::delete_project,
       query::project::query_projects,
       query::project::query_project_notes
     ])
