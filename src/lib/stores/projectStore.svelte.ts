@@ -236,6 +236,54 @@ class ProjectStore {
       });
     }
   }
+
+  async editNote(
+    noteId: number,
+    content: string,
+    timeTakenFrom: Date | undefined,
+    timeTakenTo: Date | undefined,
+  ): Promise<void> {
+    const tags = TextUtils.parseTagsFromText(content);
+
+    return invokeBridge<Note>("edit_project_note", {
+      noteId,
+      content: content.trim(),
+      tags,
+      timeTakenFrom: timeTakenFrom ? timeTakenFrom.toISOString() : null,
+      timeTakenTo: timeTakenTo ? timeTakenTo.toISOString() : null,
+    }).then(r => {
+      const updated = ParseUtils.parseNote(r.value);
+
+      for (const projectId in this.#notes) {
+        const idx = this.#notes[projectId].findIndex(n => n.id === noteId);
+
+        if (idx !== -1) {
+          this.#notes[projectId][idx] = updated;
+
+          const project = this.#projects.find(p => p.id === Number(projectId));
+
+          if (project) {
+            project.modifiedAt = new Date(updated.modifiedAt ?? updated.createdAt);
+          }
+
+          break;
+        }
+      }
+    });
+  }
+
+  async deleteNote(noteId: number): Promise<void> {
+    return invokeBridge<void>("delete_project_note", { noteId }).then(() => {
+      for (const projectId in this.#notes) {
+        const idx = this.#notes[projectId].findIndex(n => n.id === noteId);
+
+        if (idx !== -1) {
+          this.#notes[projectId].splice(idx, 1);
+          break;
+        }
+      }
+    });
+  }
 }
 
 const instance = new ProjectStore();

@@ -1,4 +1,5 @@
 pub mod project;
+pub mod note;
 
 use serde::Serialize;
 use std::fmt::Display;
