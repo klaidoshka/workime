@@ -84,3 +84,12 @@ pub async fn delete_project(state: State<'_, ApplicationState>, id: i32) -> Brid
     .map(|result| result.rows_affected() > 0)
     .as_bridge_response()
 }
+
+pub async fn update_modified_at(pool: &sqlx::SqlitePool, project_id: i32) -> Result<(), sqlx::Error> {
+  sqlx::query("UPDATE projects SET modified_at = $1 WHERE id = $2")
+    .bind(Utc::now())
+    .bind(project_id)
+    .execute(pool)
+    .await
+    .map(|_| ())
+}

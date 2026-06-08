@@ -259,13 +259,6 @@ class ProjectStore {
 
         if (idx !== -1) {
           this.#notes[projectId][idx] = updated;
-
-          const project = this.#projects.find(p => p.id === Number(projectId));
-
-          if (project) {
-            project.modifiedAt = new Date(updated.modifiedAt ?? updated.createdAt);
-          }
-
           break;
         }
       }
