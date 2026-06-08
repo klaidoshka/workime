@@ -17,7 +17,7 @@ pub async fn create_project_note(
 ) -> BridgeResponse<Note> {
   let app = state.lock().await;
 
-  sqlx::query_as::<_, Note>(
+  let result = sqlx::query_as::<_, Note>(
         "INSERT INTO project_notes (project_id, created_at, content, tags, time_taken_from, time_taken_to)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *"
@@ -30,7 +30,13 @@ pub async fn create_project_note(
         .bind(time_taken_to)
         .fetch_one(app.pool())
         .await
-        .as_bridge_response()
+        .as_bridge_response();
+
+  if result.is_ok() {
+    let _ = update_modified_at(app.pool(), project_id).await;
+  }
+
+  result
 }
 
 #[tauri::command]
