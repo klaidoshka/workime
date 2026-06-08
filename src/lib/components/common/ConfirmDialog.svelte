@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { portal } from "$lib/utils/ui";
+  import { portal } from "$lib/utils/ui";
 
   interface Props {
     open: boolean;
@@ -17,8 +17,8 @@
     message,
     confirmLabel = "Confirm",
     cancelLabel = "Cancel",
-    onConfirm: onconfirm,
-    onClose: onclose,
+    onConfirm: onConfirm,
+    onClose: onClose,
   }: Props = $props();
 
   let dialogElement = $state() as HTMLDialogElement;
@@ -35,12 +35,12 @@
 
   function handleCancel() {
     open = false;
-    onclose?.();
+    onClose();
   }
 
   function handleConfirm() {
     open = false;
-    onconfirm?.();
+    onConfirm();
   }
 
   function handleCancelEvent(e: Event) {
