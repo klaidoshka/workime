@@ -4,19 +4,20 @@
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/projectStore.svelte";
   import { portal } from "$lib/utils/ui";
-  import { EllipsisVertical, Pencil, Pin, Trash2 } from "@lucide/svelte";
+  import { EllipsisVertical, Pin } from "@lucide/svelte";
   import { tick } from "svelte";
   import ConfirmDialog from "../common/ConfirmDialog.svelte";
+  import ContextMenu from "../common/ContextMenu.svelte";
   import { getProjectIconAndColor } from "./project/iconColorPicker/IconColorPicker";
   import IconColorPicker from "./project/iconColorPicker/IconColorPicker.svelte";
 
   let { project }: { project: Project } = $props();
 
   let showPicker = $state(false);
-  let showDropdown = $state(false);
+  let showContextMenu = $state(false);
   let showDeleteConfirm = $state(false);
   let isEditingName = $state(false);
-  let editNameValue = $state(project.label);
+  let editNameValue = $derived(project.label);
 
   let triggerButton = $state() as HTMLButtonElement;
   let menuButton = $state() as HTMLButtonElement;
@@ -42,7 +43,7 @@
     };
 
     showPicker = true;
-    showDropdown = false;
+    showContextMenu = false;
   }
 
   function toggleDropdown(e: MouseEvent) {
@@ -55,12 +56,12 @@
       left: rect.right + window.scrollX - 160,
     };
 
-    showDropdown = !showDropdown;
+    showContextMenu = !showContextMenu;
     showPicker = false;
   }
 
   async function startRename() {
-    showDropdown = false;
+    showContextMenu = false;
     editNameValue = project.label;
     isEditingName = true;
 
@@ -89,7 +90,7 @@
   }
 
   function showDeleteDialog() {
-    showDropdown = false;
+    showContextMenu = false;
     showDeleteConfirm = true;
   }
 
@@ -100,13 +101,7 @@
       }
     });
   }
-
-  function handleWindowClick() {
-    showDropdown = false;
-  }
 </script>
-
-<svelte:window onclick={handleWindowClick} />
 
 <div class="relative w-full group">
   <div
@@ -137,17 +132,20 @@
         type="text"
         bind:value={editNameValue}
         onblur={saveRename}
-        onkeydown={(e) =>
-          e.key === "Enter"
-            ? saveRename()
-            : e.key === "Escape"
-              ? cancelRename()
-              : null}
+        onkeydown={(e) => {
+          if (e.key === "Enter") {
+            saveRename();
+          } else if (e.key === "Escape") {
+            cancelRename();
+          }
+        }}
         class="flex-1 min-w-0 bg-s1 border border-bd rounded px-1.5 py-0.5 text-sm text-tx focus:outline-none focus:border-ac-br" />
     {:else}
       <button
         type="button"
-        onclick={() => (instance.selectedId = project.id)}
+        onclick={() => {
+          instance.selectedId = project.id;
+        }}
         class="flex-1 min-w-0 text-left truncate pr-14 focus:outline-none">
         {project.label}
       </button>
@@ -180,42 +178,34 @@
 
   {#if showPicker}
     <div
+      role="presentation"
       use:portal
       class="absolute z-9999"
       style="top: {pickerPos.top}px; left: {pickerPos.left}px;"
-      onclick={(e) => e.stopPropagation()}>
+      onclick={(e) => {
+        e.stopPropagation();
+      }}>
       <IconColorPicker
         icon={project.icon ?? DEFAULT_ICON}
         color={project.color ?? DEFAULT_COLOR}
         onchange={handleIconColorChange}
-        onclose={() => (showPicker = false)} />
+        onclose={() => {
+          showPicker = false;
+        }} />
     </div>
   {/if}
 
-  {#if showDropdown}
-    <div
-      use:portal
-      class="absolute z-9999 w-40 bg-s1 border border-bd rounded-xl shadow-lg p-1 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100"
-      style="top: {dropdownPos.top}px; left: {dropdownPos.left}px;"
-      onclick={(e) => e.stopPropagation()}>
-      <button
-        type="button"
-        onclick={startRename}
-        class="w-full px-2 py-1.5 text-xs text-tx text-left flex items-center gap-2 rounded-lg hover:bg-s2 transition-colors">
-        <Pencil class="w-3.5 h-3.5 text-tx-dim" />
-        Rename Project
-      </button>
-
-      <div class="h-px bg-bd my-0.5"></div>
-
-      <button
-        type="button"
-        onclick={showDeleteDialog}
-        class="w-full px-2 py-1.5 text-xs text-re text-left flex items-center gap-2 rounded-lg hover:bg-re/10 transition-colors">
-        <Trash2 class="w-3.5 h-3.5 text-re" />
-        Delete Project
-      </button>
-    </div>
+  {#if showContextMenu}
+    <ContextMenu
+      top={dropdownPos.top}
+      left={dropdownPos.left}
+      editLabel="Rename Project"
+      deleteLabel="Delete Project"
+      onEdit={startRename}
+      onDelete={showDeleteDialog}
+      onClose={() => {
+        showContextMenu = false;
+      }} />
   {/if}
 </div>
 
@@ -225,4 +215,6 @@
   message="Are you sure you want to delete project '{project.label}'? This action is permanent and can't be undone."
   confirmLabel="Delete"
   onConfirm={executeDeletion}
-  onClose={() => console.log("Dismissed deletion")} />
+  onClose={() => {
+    console.log("Dismissed deletion");
+  }} />
