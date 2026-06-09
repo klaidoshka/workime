@@ -112,8 +112,8 @@
       : 'text-tx-dim border-transparent hover:bg-s2 hover:text-tx'}">
     {#if instance.selectedId === project.id}
       <span
-        class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-ac-br rounded-r-full"
-      ></span>
+        class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-ac-br rounded-r-full">
+      </span>
     {/if}
 
     <button
@@ -216,5 +216,5 @@
   confirmLabel="Delete"
   onConfirm={executeDeletion}
   onClose={() => {
-    console.log("Dismissed deletion");
+    showDeleteConfirm = false;
   }} />

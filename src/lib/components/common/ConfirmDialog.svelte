@@ -1,7 +1,15 @@
 <script lang="ts">
   import { portal } from "$lib/utils/ui";
 
-  interface Props {
+  let {
+    open = $bindable(false),
+    title,
+    message,
+    confirmLabel = "Confirm",
+    cancelLabel = "Cancel",
+    onConfirm,
+    onClose,
+  }: {
     open: boolean;
     title: string;
     message: string;
@@ -9,17 +17,7 @@
     cancelLabel?: string;
     onConfirm: () => void;
     onClose: () => void;
-  }
-
-  let {
-    open = $bindable(false),
-    title,
-    message,
-    confirmLabel = "Confirm",
-    cancelLabel = "Cancel",
-    onConfirm: onConfirm,
-    onClose: onClose,
-  }: Props = $props();
+  } = $props();
 
   let dialogElement = $state() as HTMLDialogElement;
 

@@ -5,8 +5,8 @@
   let {
     top,
     left,
-    editLabel = "Edit Log",
-    deleteLabel = "Delete Log",
+    editLabel = "Edit",
+    deleteLabel = "Delete",
     onEdit,
     onDelete,
     onClose,

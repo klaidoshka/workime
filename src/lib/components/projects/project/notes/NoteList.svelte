@@ -5,7 +5,10 @@
   import instance from "$lib/stores/projectStore.svelte";
   import NoteCard from "./NoteCard.svelte";
 
-  let props: {
+  let {
+    notes,
+    projectId,
+  }: {
     notes: Note[];
     projectId: number;
   } = $props();
@@ -21,7 +24,7 @@
   let targetDeleteNoteId = $state<number | null>(null);
 
   $effect(() => {
-    if (props.notes && scrollContainer) {
+    if (notes && scrollContainer) {
       scrollContainer.scrollTo({
         top: scrollContainer.scrollHeight,
         behavior: "smooth",
@@ -79,9 +82,9 @@
 <div
   bind:this={scrollContainer}
   class="island w-full flex-1 p-4 overflow-y-auto min-h-0">
-  {#if props.notes.length > 0}
+  {#if notes.length > 0}
     <div class="flex flex-col min-h-0 relative pl-0 timeline-rail">
-      {#each props.notes as note (note.id)}
+      {#each notes as note (note.id)}
         <NoteCard
           bind:this={cardRefs[note.id]}
           {note}

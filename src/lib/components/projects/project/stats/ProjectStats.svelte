@@ -4,9 +4,15 @@
   import instance from "$lib/stores/projectStore.svelte";
   import { calculateDashboardStats } from "./ProjectStats";
 
-  let props: { project: Project; notes: Note[] } = $props();
+  let {
+    project,
+    notes,
+  }: {
+    project: Project;
+    notes: Note[];
+  } = $props();
 
-  const stats = $derived(calculateDashboardStats(props.project, props.notes));
+  const stats = $derived(calculateDashboardStats(project, notes));
 
   const detailRows = $derived([
     {
@@ -31,7 +37,7 @@
 
   function handleExpectedHoursInput(e: Event) {
     const hours = parseFloat((e.target as HTMLInputElement).value) || 0;
-    instance.updateExpectedHours(props.project.id, hours);
+    instance.updateExpectedHours(project.id, hours);
   }
 
   const progressBarColor = $derived(
@@ -54,7 +60,7 @@
   <header class="flex flex-col gap-1">
     <h2 class="section-label">Time Dashboard</h2>
     <p class="text-xs text-tx-faint leading-relaxed">
-      {props.project.completed ? "Completed project" : "Active project"} · {stats.noteCount}
+      {project.completed ? "Completed project" : "Active project"} · {stats.noteCount}
       {stats.noteCount === 1 ? "note" : "notes"}
     </p>
   </header>
