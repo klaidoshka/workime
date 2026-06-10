@@ -1,22 +1,22 @@
 <script lang="ts">
   import { portal } from "$lib/utils/ui";
-  import { Pen, Trash2 } from "@lucide/svelte";
+  import type { Component } from "svelte";
+
+  export type ContextMenuAction = {
+    label: string;
+    icon: Component;
+    onClick: () => void;
+  };
 
   let {
     top,
     left,
-    editLabel = "Edit",
-    deleteLabel = "Delete",
-    onEdit,
-    onDelete,
+    actions,
     onClose,
   }: {
     top: number;
     left: number;
-    editLabel?: string;
-    deleteLabel?: string;
-    onEdit: () => void;
-    onDelete: () => void;
+    actions: ContextMenuAction[];
     onClose: () => void;
   } = $props();
 
@@ -37,27 +37,24 @@
   onclick={(e) => {
     e.stopPropagation();
   }}>
+    {#each actions as { label, icon: Icon, onClick }, i (label)}
+      {@render contextMenuButton(onClick, onClose, Icon, label)}
+
+      {#if i < actions.length - 1}
+        <div class="h-px bg-bd my-0.5"></div>
+      {/if}
+    {/each}
+</div>
+
+{#snippet contextMenuButton(onClick: () => void, onClose: () => void, Icon: Component, label: string)}
   <button
     type="button"
     onclick={() => {
-      onEdit();
+      onClick();
       onClose();
     }}
     class="w-full px-2 py-1.5 text-xs text-tx text-left flex items-center gap-2 rounded-lg hover:bg-s2 transition-colors">
-    <Pen class="w-3.5 h-3.5 text-tx-faint" />
-    {editLabel}
+      <Icon class="w-3.5 h-3.5 text-tx-faint" />
+    {label}
   </button>
-
-  <div class="h-px bg-bd my-0.5"></div>
-
-  <button
-    type="button"
-    onclick={() => {
-      onDelete();
-      onClose();
-    }}
-    class="w-full px-2 py-1.5 text-xs text-re text-left flex items-center gap-2 rounded-lg hover:bg-re/10 transition-colors">
-    <Trash2 class="w-3.5 h-3.5 text-re" />
-    {deleteLabel}
-  </button>
-</div>
+{/snippet}

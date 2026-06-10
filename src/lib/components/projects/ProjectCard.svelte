@@ -4,7 +4,7 @@
   import type { Project } from "$lib/representation/project";
   import instance from "$lib/stores/projectStore.svelte";
   import { portal } from "$lib/utils/ui";
-  import { EllipsisVertical, Pin } from "@lucide/svelte";
+  import { EllipsisVertical, Pen, Pin, Trash2 } from "@lucide/svelte";
   import { tick } from "svelte";
   import ConfirmDialog from "../common/ConfirmDialog.svelte";
   import ContextMenu from "../common/ContextMenu.svelte";
@@ -199,10 +199,18 @@
     <ContextMenu
       top={dropdownPos.top}
       left={dropdownPos.left}
-      editLabel="Rename Project"
-      deleteLabel="Delete Project"
-      onEdit={startRename}
-      onDelete={showDeleteDialog}
+      actions={[
+        {
+          label: "Rename Project",
+          icon: Pen,
+          onClick: startRename,
+        },
+        {
+          label: "Delete Project",
+          icon: Trash2,
+          onClick: showDeleteDialog,
+        }
+      ]}
       onClose={() => {
         showContextMenu = false;
       }} />

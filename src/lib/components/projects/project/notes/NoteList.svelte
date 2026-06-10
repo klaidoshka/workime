@@ -3,6 +3,7 @@
   import ContextMenu from "$lib/components/common/ContextMenu.svelte";
   import type { Note } from "$lib/representation/note";
   import instance from "$lib/stores/projectStore.svelte";
+    import { Pen, Trash2 } from "@lucide/svelte";
   import NoteCard from "./NoteCard.svelte";
 
   let {
@@ -106,10 +107,18 @@
   <ContextMenu
     top={menuPos.top}
     left={menuPos.left}
-    editLabel="Edit Log"
-    deleteLabel="Delete Log"
-    onEdit={handleEdit}
-    onDelete={handleDeleteRequest}
+    actions={[
+      {
+        label: "Edit Note",
+        icon: Pen,
+        onClick: handleEdit,
+      },
+      {
+        label: "Delete Note",
+        icon: Trash2,
+        onClick: handleDeleteRequest,
+      }
+    ]}
     onClose={() => {
       activeMenuNoteId = null;
     }} />
