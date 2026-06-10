@@ -22,6 +22,7 @@ pub fn run() {
       Ok(())
     })
     .plugin(tauri_plugin_opener::init())
+    .plugin(tauri_plugin_dialog::init())
     .invoke_handler(tauri::generate_handler![
       cmd::project::create_project,
       cmd::project::edit_project,
