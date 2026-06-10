@@ -21,6 +21,10 @@ class ParseUtils {
       timeTakenTo: value.time_taken_to ? new Date(value.time_taken_to) : undefined,
     };
   }
+
+  static parseJsonState<T>(value: string): T {
+    return JSON.parse(value);
+  }
 }
 
 export default ParseUtils;

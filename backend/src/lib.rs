@@ -3,6 +3,7 @@ use tauri::{async_runtime, Manager};
 use tokio::sync::Mutex;
 
 mod application;
+mod bridge;
 mod cmd;
 mod entity;
 mod query;
@@ -30,8 +31,11 @@ pub fn run() {
       cmd::note::create_project_note,
       cmd::note::edit_project_note,
       cmd::note::delete_project_note,
+      cmd::json_states::create_missing_json_state,
+      cmd::json_states::edit_json_state,
       query::project::query_projects,
       query::note::query_project_notes,
+      query::json_states::query_json_state,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

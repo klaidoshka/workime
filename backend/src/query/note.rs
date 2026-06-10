@@ -1,6 +1,6 @@
 use crate::{
   application::ApplicationState,
-  cmd::{AsBridgeResponse, BridgeResponse},
+  bridge::{AsBridgeResponse, BridgeResponse},
   entity::{Note},
 };
 use tauri::State;

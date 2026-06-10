@@ -1,6 +1,7 @@
 use crate::{
   application::ApplicationState,
-  cmd::{project::update_modified_at, BridgeResponse, SuccessResponse},
+  bridge::{BridgeResponse, SuccessResponse},
+  cmd::project::update_modified_at,
   entity::Note,
 };
 use chrono::Utc;

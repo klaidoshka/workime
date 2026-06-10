@@ -3,8 +3,9 @@ use sqlx::types::{
   chrono::{DateTime, Utc},
   Json,
 };
+use sqlx::FromRow;
 
-#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+#[derive(Debug, FromRow, Deserialize, Serialize)]
 pub struct Note {
   pub id: i64,
   pub created_at: DateTime<Utc>,
@@ -16,7 +17,7 @@ pub struct Note {
   pub project_id: i64,
 }
 
-#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+#[derive(Debug, FromRow, Deserialize, Serialize)]
 pub struct Project {
   pub id: i64,
   pub label: String,
@@ -28,4 +29,10 @@ pub struct Project {
   pub color: String,
   pub scratch_pad: Option<String>,
   pub expected_completion_hours: Option<i32>,
+}
+
+#[derive(Debug, FromRow, Deserialize, Serialize)]
+pub struct JsonState {
+  pub id: String,
+  pub state: String,
 }

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS json_states(
+  id TEXT PRIMARY KEY NOT NULL,
+  state TEXT NOT NULL
+);

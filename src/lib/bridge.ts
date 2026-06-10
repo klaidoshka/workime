@@ -8,7 +8,7 @@ export type ErrorResponse = {
 };
 
 export type SuccessResponse<T> = {
-  value: T | undefined;
+  value: T;
 };
 
 export function isErrorResponse<T>(response: BridgeResponse<T>): response is ErrorResponse {
