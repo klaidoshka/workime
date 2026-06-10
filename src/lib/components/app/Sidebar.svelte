@@ -4,7 +4,11 @@
   import { routes, settingsRoute } from "../../constants/routes";
 
   const isActive = (route: Route) => {
-    return page.url.pathname === route.path;
+    if (route.path === "/") {
+      return page.url.pathname === "/";
+    }
+
+    return page.url.pathname.startsWith(route.path);
   };
 </script>
 
