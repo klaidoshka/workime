@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TimeRangePicker from "$lib/components/common/timeRangePicker/TimeRangePicker.svelte";
+  import TimeRangePicker from "$lib/components/common/time/TimeRangePicker.svelte";
   import type { Note } from "$lib/representation/note";
   import instance from "$lib/stores/projectStore.svelte";
   import TextUtils from "$lib/utils/text";
@@ -128,7 +128,8 @@
 
           <TimeRangePicker
             bind:timeFrom={editTimeFrom}
-            bind:timeTo={editTimeTo} />
+            bind:timeTo={editTimeTo}
+            showDifference />
 
           <div class="flex justify-end gap-1.5">
             <button

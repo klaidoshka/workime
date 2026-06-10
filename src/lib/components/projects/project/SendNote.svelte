@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TimeRangePicker from "$lib/components/common/timeRangePicker/TimeRangePicker.svelte";
+  import TimeRangePicker from "$lib/components/common/time/TimeRangePicker.svelte";
   import type { NoteAttachment } from "$lib/representation/note";
   import instance from "$lib/stores/projectStore.svelte";
   import { Paperclip, Send, X } from "@lucide/svelte";
@@ -99,7 +99,7 @@
   <div
     class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-bd-dim">
     <div class="flex flex-wrap items-center gap-2.5">
-      <TimeRangePicker bind:timeFrom bind:timeTo />
+      <TimeRangePicker bind:timeFrom bind:timeTo showDifference />
     </div>
 
     <div class="flex items-center gap-2 shrink-0">
