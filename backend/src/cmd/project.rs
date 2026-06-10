@@ -41,8 +41,6 @@ pub async fn edit_project(
 ) -> BridgeResponse<Project> {
   let app = state.lock().await;
 
-  println!("Edited project with id: {}", id);
-
   sqlx::query_as::<_, Project>(
     r#"
         UPDATE projects
@@ -85,11 +83,14 @@ pub async fn delete_project(state: State<'_, ApplicationState>, id: i32) -> Brid
     .as_bridge_response()
 }
 
-pub async fn update_modified_at(pool: &sqlx::SqlitePool, project_id: i32) -> Result<(), sqlx::Error> {
+pub async fn update_modified_at(
+  tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+  project_id: i32,
+) -> Result<(), sqlx::Error> {
   sqlx::query("UPDATE projects SET modified_at = $1 WHERE id = $2")
     .bind(Utc::now())
     .bind(project_id)
-    .execute(pool)
+    .execute(&mut **tx)
     .await
     .map(|_| ())
 }
