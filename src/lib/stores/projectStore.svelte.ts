@@ -10,7 +10,7 @@ class ProjectStore {
   #projects = $state<Project[]>([]);
   #notes = $state<Record<string, Note[]>>({});
 
-  constructor() {
+  init() {
     invokeBridge<Project[]>("query_projects").then(async (r) => {
       this.#projects = r.value?.map(p => ParseUtils.parseProject(p)) || [];
 

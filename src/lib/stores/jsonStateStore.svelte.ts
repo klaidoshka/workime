@@ -7,18 +7,16 @@ class JsonStateStore {
   #states = $state<Record<string, any>>({});
   #loading = $state(true);
 
-  constructor() {
-    invokeBridge<string>("query_json_state", { id: JsonStateId.SETTINGS }).then(async (r) => {
-      this.#states[JsonStateId.SETTINGS] = ParseUtils.parseJsonState<SettingsJsonState>(r.value);
-      this.#loading = false;
-    });
-  }
-
-  createDefaults() {
+  init() {
     invokeBridge<number>("create_missing_json_state", {
       id: JsonStateId.SETTINGS,
       value: JSON.stringify(defaultSettingsJsonState)
-    });
+    })
+      .then(() => invokeBridge<string>("query_json_state", { id: JsonStateId.SETTINGS })
+        .then((r) => {
+          this.#states[JsonStateId.SETTINGS] = ParseUtils.parseJsonState<SettingsJsonState>(r.value);
+          this.#loading = false;
+        }));
   }
 
   get isLoading() {

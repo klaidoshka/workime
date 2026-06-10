@@ -16,7 +16,7 @@
     placeholder = "Select option...",
     onClick,
   }: {
-    value: string;
+    value?: string;
     options: Option[];
     placeholder?: string;
     onClick?: () => void;

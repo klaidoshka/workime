@@ -36,9 +36,10 @@ pub async fn edit_json_state(
 
   sqlx::query(
     "
-    MERGE INTO json_states (id, state) VALUES ($1, $2)
-    ON CONFLICT (id) DO
-      UPDATE SET state = $2 WHERE json_states.id = $1
+    INSERT INTO json_states (id, state)
+    VALUES ($1, $2)
+      ON CONFLICT(id) DO UPDATE SET
+        state = excluded.state
     ",
   )
   .bind(id)

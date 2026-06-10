@@ -1,4 +1,9 @@
+import type { StartupPage } from "$lib/constants/startupPages";
+
 export interface SettingsJsonState {
+  programLocation: string;
+  startupBehavior: 'specific-page' | 'last-session'
+  startupPage?: StartupPage;
   workStart: Date;
   workEnd: Date;
   lunchStart: Date;
@@ -9,6 +14,9 @@ export interface SettingsJsonState {
 };
 
 export const defaultSettingsJsonState: SettingsJsonState = {
+  programLocation: '/home/xd/bin/workime',
+  startupBehavior: 'specific-page',
+  startupPage: 'home',
   workStart: new Date(0, 0, 0, 8, 0), // 8:00 AM
   workEnd: new Date(0, 0, 0, 17, 0), // 5:00 PM
   lunchStart: new Date(0, 0, 0, 12, 0), // 12:00 PM

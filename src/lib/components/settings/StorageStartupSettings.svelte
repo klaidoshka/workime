@@ -1,14 +1,20 @@
 <script lang="ts">
-  import { specificPageOptions } from "$lib/constants/pageOptions";
+  import { startupPages, type StartupPage } from "$lib/constants/startupPages";
   import { Folder, FolderOpen } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { openPath } from "@tauri-apps/plugin-opener";
   import { blur } from "svelte/transition";
   import Dropdown from "../common/Dropdown.svelte";
 
-  let programLocation = $state("/usr/local/bin/time-tracker");
-  let onStartPage = $state("last-session");
-  let specificPageSelection = $state("dashboard");
+  let {
+    programLocation = $bindable(),
+    startupBehavior = $bindable(),
+    startupPage = $bindable(),
+  }: {
+    programLocation: string;
+    startupBehavior: "last-session" | "specific-page";
+    startupPage?: StartupPage;
+  } = $props();
 
   async function selectLocation() {
     try {
@@ -82,13 +88,13 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full mt-1">
         <label
           class="flex items-start gap-3 p-3 rounded-xl border bg-s2/40 cursor-pointer select-none transition-colors duration-150"
-          class:border-ac-bd={onStartPage === "last-session"}
-          class:border-bd-dim={onStartPage !== "last-session"}>
+          class:border-ac-bd={startupBehavior === "last-session"}
+          class:border-bd-dim={startupBehavior !== "last-session"}>
           <input
             type="radio"
             name="specificPage"
             value="last-session"
-            bind:group={onStartPage}
+            bind:group={startupBehavior}
             class="accent-ac-br mt-0.5" />
           <div class="min-w-0">
             <span class="text-xs font-semibold text-tx block">
@@ -102,13 +108,13 @@
 
         <label
           class="flex items-start gap-3 p-3 rounded-xl border bg-s2/40 cursor-pointer select-none transition-colors duration-150"
-          class:border-ac-bd={onStartPage === "specific-page"}
-          class:border-bd-dim={onStartPage !== "specific-page"}>
+          class:border-ac-bd={startupBehavior === "specific-page"}
+          class:border-bd-dim={startupBehavior !== "specific-page"}>
           <input
             type="radio"
             name="specificPage"
             value="specific-page"
-            bind:group={onStartPage}
+            bind:group={startupBehavior}
             class="accent-ac-br mt-0.5" />
 
           <div class="min-w-0 w-full">
@@ -122,11 +128,11 @@
 
             <div class="mt-2" transition:blur={{ duration: 100 }}>
               <Dropdown
-                options={specificPageOptions}
-                bind:value={specificPageSelection}
+                options={startupPages}
+                bind:value={startupPage}
                 placeholder="Select Page"
                 onClick={() => {
-                  onStartPage = "specific-page";
+                  startupBehavior = "specific-page";
                 }} />
             </div>
           </div>

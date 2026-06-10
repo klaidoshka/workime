@@ -10,6 +10,9 @@
     jsonStateStore.getState<SettingsJsonState>(JsonStateId.SETTINGS),
   );
 
+  let programLocation = $derived(settings.programLocation);
+  let startupBehavior = $derived(settings.startupBehavior);
+  let startupPage = $derived(settings.startupPage);
   let workStart = $derived(settings.workStart);
   let workEnd = $derived(settings.workEnd);
   let lunchStart = $derived(settings.lunchStart);
@@ -61,7 +64,10 @@
   </div>
 
   <div class="flex flex-wrap gap-5 flex-1 min-h-0 max-w-3xl">
-    <StorageStartupSettings />
+    <StorageStartupSettings
+      bind:programLocation
+      bind:startupBehavior
+      bind:startupPage />
 
     <WorktimeSettings
       bind:workStart

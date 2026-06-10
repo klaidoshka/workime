@@ -5,10 +5,10 @@
 
   let { children } = $props();
 
-  // Initialize stores by accessing statically and/or calling methods on them
-  jsonStateStore.createDefaults();
+  // Initialize stores
+  jsonStateStore.init();
 
-  projectStore;
+  projectStore.init();
 
   let isLoading = $derived(jsonStateStore.isLoading);
 </script>
