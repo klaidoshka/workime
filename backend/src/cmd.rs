@@ -1,5 +1,5 @@
-pub mod project;
 pub mod note;
+pub mod project;
 
 use serde::Serialize;
 use std::fmt::Display;
@@ -18,6 +18,14 @@ pub type BridgeResponse<T> = Result<SuccessResponse<T>, ErrorResponse>;
 
 pub trait AsBridgeResponse<T> {
   fn as_bridge_response(self) -> BridgeResponse<T>;
+}
+
+impl From<sqlx::Error> for ErrorResponse {
+  fn from(e: sqlx::Error) -> Self {
+    ErrorResponse {
+      message: e.to_string(),
+    }
+  }
 }
 
 impl<T, E: Display> AsBridgeResponse<T> for Result<T, E> {

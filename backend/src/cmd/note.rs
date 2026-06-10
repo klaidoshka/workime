@@ -1,6 +1,6 @@
 use crate::{
   application::ApplicationState,
-  cmd::{project::update_modified_at, AsBridgeResponse, BridgeResponse},
+  cmd::{project::update_modified_at, BridgeResponse, SuccessResponse},
   entity::Note,
 };
 use chrono::Utc;
@@ -16,28 +16,7 @@ pub async fn create_project_note(
   time_taken_to: Option<String>,
 ) -> BridgeResponse<Note> {
   let app = state.lock().await;
-
-  create_project_note_tx(
-    app.pool(),
-    project_id,
-    content,
-    tags,
-    time_taken_from,
-    time_taken_to,
-  )
-  .await
-  .as_bridge_response()
-}
-
-async fn create_project_note_tx(
-  pool: &sqlx::SqlitePool,
-  project_id: i32,
-  content: String,
-  tags: Vec<String>,
-  time_taken_from: Option<String>,
-  time_taken_to: Option<String>,
-) -> Result<Note, sqlx::Error> {
-  let mut tx = pool.begin().await?;
+  let mut tx = app.pool().begin().await?;
 
   let note = sqlx::query_as::<_, Note>(
         "INSERT INTO project_notes (project_id, created_at, content, tags, time_taken_from, time_taken_to)
@@ -54,9 +33,10 @@ async fn create_project_note_tx(
     .await?;
 
   update_modified_at(&mut tx, project_id).await?;
+
   tx.commit().await?;
 
-  Ok(note)
+  Ok(SuccessResponse { value: Some(note) })
 }
 
 #[tauri::command]
@@ -65,13 +45,7 @@ pub async fn delete_project_note(
   note_id: i32,
 ) -> BridgeResponse<()> {
   let app = state.lock().await;
-  delete_project_note_tx(app.pool(), note_id)
-    .await
-    .as_bridge_response()
-}
-
-async fn delete_project_note_tx(pool: &sqlx::SqlitePool, note_id: i32) -> Result<(), sqlx::Error> {
-  let mut tx = pool.begin().await?;
+  let mut tx = app.pool().begin().await?;
 
   let project_id = get_note_project_id(&mut *tx, note_id).await?;
 
@@ -82,9 +56,10 @@ async fn delete_project_note_tx(pool: &sqlx::SqlitePool, note_id: i32) -> Result
     .map(|_| ())?;
 
   update_modified_at(&mut tx, project_id).await?;
+
   tx.commit().await?;
 
-  Ok(())
+  Ok(SuccessResponse { value: Some(()) })
 }
 
 #[tauri::command]
@@ -97,27 +72,7 @@ pub async fn edit_project_note(
   time_taken_to: Option<String>,
 ) -> BridgeResponse<Note> {
   let app = state.lock().await;
-  edit_project_note_tx(
-    app.pool(),
-    note_id,
-    content,
-    tags,
-    time_taken_from,
-    time_taken_to,
-  )
-  .await
-  .as_bridge_response()
-}
-
-async fn edit_project_note_tx(
-  pool: &sqlx::SqlitePool,
-  note_id: i32,
-  content: Option<String>,
-  tags: Option<Vec<String>>,
-  time_taken_from: Option<String>,
-  time_taken_to: Option<String>,
-) -> Result<Note, sqlx::Error> {
-  let mut tx = pool.begin().await?;
+  let mut tx = app.pool().begin().await?;
 
   let project_id = get_note_project_id(&mut *tx, note_id).await?;
 
@@ -144,9 +99,10 @@ async fn edit_project_note_tx(
   .await?;
 
   update_modified_at(&mut tx, project_id).await?;
+
   tx.commit().await?;
 
-  Ok(note)
+  Ok(SuccessResponse { value: Some(note) })
 }
 
 async fn get_note_project_id(
