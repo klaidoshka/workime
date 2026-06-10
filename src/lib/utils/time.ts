@@ -36,6 +36,31 @@ class TimeUtils {
 
     return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
+
+  static getDurationText(from?: Date, to?: Date): string {
+    if (!from || !to || !(from instanceof Date) || !(to instanceof Date)) {
+      return "";
+    }
+
+    let diffInMinutes = Math.floor((to.getTime() - from.getTime()) / (1000 * 60));
+
+    if (diffInMinutes < 0) {
+      diffInMinutes += 24 * 60;
+    }
+
+    const hours = Math.floor(diffInMinutes / 60);
+    const minutes = diffInMinutes % 60;
+
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  }
+
+  static formatMinutesToTime(date?: Date): string {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return "";
+    }
+
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  }
 }
 
 export default TimeUtils;

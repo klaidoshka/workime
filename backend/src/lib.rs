@@ -24,10 +24,13 @@ pub fn run() {
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
       cmd::project::create_project,
-      cmd::project::create_project_note,
       cmd::project::edit_project,
+      cmd::project::delete_project,
+      cmd::note::create_project_note,
+      cmd::note::edit_project_note,
+      cmd::note::delete_project_note,
       query::project::query_projects,
-      query::project::query_project_notes
+      query::note::query_project_notes,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -128,6 +128,24 @@ class ProjectStore {
     }
   }
 
+  updateLabel(id: number, label: string) {
+    const project = this.#projects.find(p => p.id === id);
+
+    if (project) {
+      invokeBridge<Project>("edit_project", {
+        id,
+        label: label.trim(),
+      }).then((r) => {
+        if (r.value) {
+          const parsed = ParseUtils.parseProject(r.value);
+
+          project.label = parsed.label;
+          project.modifiedAt = parsed.modifiedAt;
+        }
+      });
+    }
+  }
+
   togglePin(id: number) {
     const project = this.#projects.find(p => p.id === id);
 
@@ -198,6 +216,66 @@ class ProjectStore {
         }
       });
     }
+  }
+
+  async delete(id: number) {
+    const projectIndex = this.#projects.findIndex(p => p.id === id);
+
+    if (projectIndex !== -1) {
+      await invokeBridge<void>("delete_project", { id }).then(() => {
+        delete this.#notes[id];
+        this.#projects.splice(projectIndex, 1);
+
+        if (this.selectedId === id) {
+          if (this.projects.length > 0) {
+            this.selectedId = this.projects[0].id;
+          } else {
+            this.selectedId = undefined;
+          }
+        }
+      });
+    }
+  }
+
+  async editNote(
+    noteId: number,
+    content: string,
+    timeTakenFrom: Date | undefined,
+    timeTakenTo: Date | undefined,
+  ): Promise<void> {
+    const tags = TextUtils.parseTagsFromText(content);
+
+    return invokeBridge<Note>("edit_project_note", {
+      noteId,
+      content: content.trim(),
+      tags,
+      timeTakenFrom: timeTakenFrom ? timeTakenFrom.toISOString() : null,
+      timeTakenTo: timeTakenTo ? timeTakenTo.toISOString() : null,
+    }).then(r => {
+      const updated = ParseUtils.parseNote(r.value);
+
+      for (const projectId in this.#notes) {
+        const idx = this.#notes[projectId].findIndex(n => n.id === noteId);
+
+        if (idx !== -1) {
+          this.#notes[projectId][idx] = updated;
+          break;
+        }
+      }
+    });
+  }
+
+  async deleteNote(noteId: number): Promise<void> {
+    return invokeBridge<void>("delete_project_note", { noteId }).then(() => {
+      for (const projectId in this.#notes) {
+        const idx = this.#notes[projectId].findIndex(n => n.id === noteId);
+
+        if (idx !== -1) {
+          this.#notes[projectId].splice(idx, 1);
+          break;
+        }
+      }
+    });
   }
 }
 
