@@ -2,11 +2,11 @@
   import { portal } from "$lib/utils/ui";
   import type { Component } from "svelte";
 
-  export type ContextMenuAction = {
+  interface ContextMenuAction {
     label: string;
     icon: Component;
     onClick: () => void;
-  };
+  }
 
   let {
     top,
@@ -37,16 +37,21 @@
   onclick={(e) => {
     e.stopPropagation();
   }}>
-    {#each actions as { label, icon: Icon, onClick }, i (label)}
-      {@render contextMenuButton(onClick, onClose, Icon, label)}
+  {#each actions as { label, icon: Icon, onClick }, i (label)}
+    {@render contextMenuButton(onClick, onClose, Icon, label)}
 
-      {#if i < actions.length - 1}
-        <div class="h-px bg-bd my-0.5"></div>
-      {/if}
-    {/each}
+    {#if i < actions.length - 1}
+      <div class="h-px bg-bd my-0.5"></div>
+    {/if}
+  {/each}
 </div>
 
-{#snippet contextMenuButton(onClick: () => void, onClose: () => void, Icon: Component, label: string)}
+{#snippet contextMenuButton(
+  onClick: () => void,
+  onClose: () => void,
+  Icon: Component,
+  label: string,
+)}
   <button
     type="button"
     onclick={() => {
@@ -54,7 +59,7 @@
       onClose();
     }}
     class="w-full px-2 py-1.5 text-xs text-tx text-left flex items-center gap-2 rounded-lg hover:bg-s2 transition-colors">
-      <Icon class="w-3.5 h-3.5 text-tx-faint" />
+    <Icon class="w-3.5 h-3.5 text-tx-faint" />
     {label}
   </button>
 {/snippet}
