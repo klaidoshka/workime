@@ -1,3 +1,5 @@
+import { readable } from "svelte/store";
+
 class TimeUtils {
   static dateToMinutes(date: Date): number {
     if (!date) {
@@ -52,6 +54,66 @@ class TimeUtils {
     const minutes = diffInMinutes % 60;
 
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  }
+
+  static getLiveTime() {
+    return readable(TimeUtils.formatClock(new Date()), (set) => {
+      const tick = () => set(TimeUtils.formatClock(new Date()));
+      const msToNextMinute = (60 - new Date().getSeconds()) * 1000;
+
+      let interval: ReturnType<typeof setInterval>;
+
+      const timeout = setTimeout(() => {
+        tick();
+        interval = setInterval(tick, 60_000);
+      }, msToNextMinute);
+
+      return () => {
+        clearTimeout(timeout);
+        clearInterval(interval);
+      };
+    });
+  }
+
+  static formatClock(d: Date): string {
+    return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  static formatMinutesToHoursShort(minutes: number): string {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+
+    if (h === 0) {
+      return `${m}m`;
+    }
+
+    if (m === 0) {
+      return `${h}h`;
+    }
+
+    return `${h}h ${m}m`;
+  }
+
+  static getCountdown(h: number, m: number): string {
+    const now = new Date();
+    const target = new Date();
+
+    target.setHours(h, m, 0, 0);
+
+    const diffMs = target.getTime() - now.getTime();
+
+    if (diffMs <= 0) {
+      return "now";
+    }
+
+    const hh = Math.floor(diffMs / 3_600_000);
+    const mm = Math.floor((diffMs % 3_600_000) / 60_000);
+
+    if (hh === 0) {
+      return `in ${mm}m`;
+    }
+
+    return `in ${hh}h ${mm}m`;
   }
 
   static formatMinutesToTime(date?: Date): string {
