@@ -1,4 +1,5 @@
 <script lang="ts">
+  import RecentProjects from "$lib/components/home/RecentProjects.svelte";
   import TodayOverview from "$lib/components/home/TodayOverview.svelte";
   import TodayTimeline from "$lib/components/home/TodayTimeline.svelte";
   import TimeUtils from "$lib/utils/time";
@@ -40,6 +41,57 @@
       minutes: 60,
     },
   ];
+
+  const recentProjects = [
+    {
+      id: 1,
+      label: "Website Redesign",
+      icon: "layout",
+      color: "violet",
+      createdAt: new Date(),
+      pinned: false,
+      completed: false,
+      loggedMinutes: 760,
+      budgetHours: 15,
+      lastEntryLabel: "35 min ago",
+    },
+    {
+      id: 2,
+      label: "API Integration",
+      icon: "code",
+      color: "teal",
+      createdAt: new Date(),
+      pinned: false,
+      completed: false,
+      loggedMinutes: 495,
+      budgetHours: 15,
+      lastEntryLabel: "2 h ago",
+    },
+    {
+      id: 3,
+      label: "Q2 Client Report",
+      icon: "file-text",
+      color: "amber",
+      createdAt: new Date(),
+      pinned: false,
+      completed: false,
+      loggedMinutes: 240,
+      budgetHours: 10,
+      lastEntryLabel: "yesterday",
+    },
+    {
+      id: 4,
+      label: "Internal Tooling",
+      icon: "tool",
+      color: "gray",
+      createdAt: new Date(),
+      pinned: false,
+      completed: true,
+      loggedMinutes: 1200,
+      budgetHours: 20,
+      lastEntryLabel: "3 days ago",
+    },
+  ];
 </script>
 
 <div class="flex-1 h-full overflow-y-auto p-5 flex flex-col gap-6 min-h-0">
@@ -75,6 +127,13 @@
         entries={todayEntries}
         loggedMinutes={todayLoggedMinutes}
         targetHours={WORK_HOURS_TARGET} />
+    </div>
+  </section>
+
+  <section>
+    <p class="section-label mb-3">Recent projects</p>
+    <div class="island p-4">
+      <RecentProjects projects={recentProjects} />
     </div>
   </section>
 </div>
