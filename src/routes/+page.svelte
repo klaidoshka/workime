@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MonthlyStats from "$lib/components/home/MonthlyStats.svelte";
   import RecentProjects from "$lib/components/home/RecentProjects.svelte";
   import TodayOverview from "$lib/components/home/TodayOverview.svelte";
   import TodayTimeline from "$lib/components/home/TodayTimeline.svelte";
@@ -92,6 +93,26 @@
       lastEntryLabel: "3 days ago",
     },
   ];
+
+  const monthlyStats = {
+    totalMinutes: 3860,
+    targetHours: 160,
+    workingDaysTotal: 22,
+    workingDaysActive: 10,
+    dailyBars: [7.5, 8.1, 6.2, 0, 0, 7.8, 8.3, 5.9, 7.1, 6.8, 8.0, 5.3],
+    byProject: [
+      { label: "Website Redesign", color: "#534AB7", minutes: 1720 },
+      { label: "API Integration", color: "#0F6E56", minutes: 975 },
+      { label: "Q2 Client Report", color: "#BA7517", minutes: 680 },
+      { label: "Internal Tooling", color: "#888780", minutes: 485 },
+    ],
+  };
+
+  let statsDate = $state(new Date());
+
+  function handleMonthChange(newDate: Date): void {
+    statsDate = newDate;
+  }
 </script>
 
 <div class="flex-1 h-full overflow-y-auto p-5 flex flex-col gap-6 min-h-0">
@@ -134,6 +155,16 @@
     <p class="section-label mb-3">Recent projects</p>
     <div class="island p-4">
       <RecentProjects projects={recentProjects} />
+    </div>
+  </section>
+
+  <section>
+    <p class="section-label mb-3">Monthly stats</p>
+    <div class="island p-4">
+      <MonthlyStats
+        stats={monthlyStats}
+        currentDate={statsDate}
+        onMonthChange={handleMonthChange} />
     </div>
   </section>
 </div>
