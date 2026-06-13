@@ -36,9 +36,9 @@
   }
 
   async function saveEdit() {
-    const trimmed = editTextValue.trim();
+    const trimmedContent = editTextValue.trim();
 
-    if (!trimmed || isSaving) {
+    if (!trimmedContent || isSaving) {
       return;
     }
 
@@ -46,8 +46,15 @@
     const timeTo = editTimeFrom && editTimeTo ? editTimeTo : undefined;
 
     isSaving = true;
+
     try {
-      await instance.editNote(note.id, trimmed, timeFrom, timeTo);
+      await instance.editNote(note.id, {
+        content: trimmedContent,
+        tags: TextUtils.parseTagsFromText(trimmedContent),
+        timeTakenFrom: timeFrom,
+        timeTakenTo: timeTo,
+      });
+
       editingNoteId = null;
     } finally {
       isSaving = false;

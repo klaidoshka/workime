@@ -42,15 +42,15 @@ pub async fn create_project_note(
 #[tauri::command]
 pub async fn delete_project_note(
   state: State<'_, ApplicationState>,
-  note_id: i32,
+  id: i32,
 ) -> BridgeResponse<()> {
   let app = state.lock().await;
   let mut tx = app.pool().begin().await?;
 
-  let project_id = get_note_project_id(&mut *tx, note_id).await?;
+  let project_id = get_note_project_id(&mut *tx, id).await?;
 
   sqlx::query("DELETE FROM project_notes WHERE id = $1")
-    .bind(note_id)
+    .bind(id)
     .execute(&mut *tx)
     .await
     .map(|_| ())?;
@@ -65,7 +65,7 @@ pub async fn delete_project_note(
 #[tauri::command]
 pub async fn edit_project_note(
   state: State<'_, ApplicationState>,
-  note_id: i32,
+  id: i32,
   content: Option<String>,
   tags: Option<Vec<String>>,
   time_taken_from: Option<String>,
@@ -74,7 +74,7 @@ pub async fn edit_project_note(
   let app = state.lock().await;
   let mut tx = app.pool().begin().await?;
 
-  let project_id = get_note_project_id(&mut *tx, note_id).await?;
+  let project_id = get_note_project_id(&mut *tx, id).await?;
 
   let note = sqlx::query_as::<_, Note>(
     r#"
@@ -94,7 +94,7 @@ pub async fn edit_project_note(
   .bind(tags.map(|t| serde_json::to_string(&t).unwrap_or_else(|_| "[]".into())))
   .bind(time_taken_from)
   .bind(time_taken_to)
-  .bind(note_id)
+  .bind(id)
   .fetch_one(&mut *tx)
   .await?;
 
@@ -107,10 +107,10 @@ pub async fn edit_project_note(
 
 async fn get_note_project_id(
   tx: &mut sqlx::SqliteConnection,
-  note_id: i32,
+  id: i32,
 ) -> Result<i32, sqlx::Error> {
   sqlx::query_scalar::<_, i32>("SELECT project_id FROM project_notes WHERE id = $1")
-    .bind(note_id)
+    .bind(id)
     .fetch_one(tx)
     .await
 }
