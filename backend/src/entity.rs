@@ -29,3 +29,12 @@ pub struct Project {
   pub scratch_pad: Option<String>,
   pub expected_completion_hours: Option<i32>,
 }
+
+#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+pub struct RecentProject {
+  #[sqlx(flatten)]
+  #[serde(flatten)]
+  pub project: Project,
+  pub logged_minutes: i64,
+  pub last_entry_at: Option<DateTime<Utc>>,
+}

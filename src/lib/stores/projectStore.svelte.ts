@@ -46,6 +46,10 @@ class ProjectStore {
     return (this.selectedId && this.#notes[this.selectedId]) || [];
   }
 
+  async recentlyUsedProjects(limit = 5) {
+    return ProjectService.fetchRecentProjects(limit);
+  }
+
   async add(label: string): Promise<number> {
     const project = await ProjectService.createProject(label);
 

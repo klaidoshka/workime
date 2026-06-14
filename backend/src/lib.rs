@@ -30,6 +30,7 @@ pub fn run() {
       cmd::note::edit_project_note,
       cmd::note::delete_project_note,
       query::project::query_projects,
+      query::project::query_recent_projects,
       query::note::query_project_notes,
     ])
     .run(tauri::generate_context!())

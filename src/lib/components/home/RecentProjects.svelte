@@ -1,17 +1,15 @@
 <script lang="ts">
   import { getProjectIconAndColor } from "$lib/components/projects/project/iconColorPicker/IconColorPicker";
-  import type { Project } from "$lib/representation/project";
+  import type { RecentProject } from "$lib/representation/project";
   import TimeUtils from "$lib/utils/time";
-
-  export interface RecentProject extends Project {
-    loggedMinutes: number;
-    budgetHours?: number;
-    lastEntryLabel: string;
-  }
 
   let { projects }: { projects: RecentProject[] } = $props();
 
   function budgetPct(minutes: number, budgetHours: number): number {
+    if (!budgetHours) {
+      return 0;
+    }
+
     return Math.min(100, Math.round((minutes / (budgetHours * 60)) * 100));
   }
 </script>
@@ -35,27 +33,27 @@
         </span>
         <div class="flex items-center gap-2">
           <span class="text-2xs text-tx-faint">
-            Last entry {project.lastEntryLabel}
+            Last entry {project.lastEntryLabel ?? "No entries"}
           </span>
         </div>
       </div>
 
       <div class="flex flex-col items-end gap-1.5 shrink-0 min-w-22.5">
         <span class="font-mono text-sm font-medium text-tx tabular-nums">
-          {TimeUtils.formatMinutesToHoursShort(project.loggedMinutes)}
+          {TimeUtils.formatMinutesToHoursShort(project.loggedMinutes ?? 0)}
         </span>
-        {#if project.budgetHours}
+        {#if project.expectedCompletionHours}
           <div class="w-20 bg-s3/80 rounded-full h-1 overflow-hidden">
             <div
               class="h-full rounded-full transition-all duration-500"
               style="width:{budgetPct(
-                project.loggedMinutes,
-                project.budgetHours,
+                project.loggedMinutes ?? 0,
+                project.expectedCompletionHours,
               )}%; background:{colorValue}">
             </div>
           </div>
           <span class="text-2xs text-tx-faint">
-            of {project.budgetHours}h budget
+            of {project.expectedCompletionHours}h budget
           </span>
         {:else}
           <span class="text-2xs text-tx-faint">no budget set</span>

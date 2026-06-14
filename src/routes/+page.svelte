@@ -3,6 +3,7 @@
   import RecentProjects from "$lib/components/home/RecentProjects.svelte";
   import TodayOverview from "$lib/components/home/TodayOverview.svelte";
   import TodayTimeline from "$lib/components/home/TodayTimeline.svelte";
+  import instance from "$lib/stores/projectStore.svelte";
   import TimeUtils from "$lib/utils/time";
 
   const liveTime = TimeUtils.getLiveTime();
@@ -40,57 +41,6 @@
       from: "14:30",
       to: "15:30",
       minutes: 60,
-    },
-  ];
-
-  const recentProjects = [
-    {
-      id: 1,
-      label: "Website Redesign",
-      icon: "layout",
-      color: "violet",
-      createdAt: new Date(),
-      pinned: false,
-      completed: false,
-      loggedMinutes: 760,
-      budgetHours: 15,
-      lastEntryLabel: "35 min ago",
-    },
-    {
-      id: 2,
-      label: "API Integration",
-      icon: "code",
-      color: "teal",
-      createdAt: new Date(),
-      pinned: false,
-      completed: false,
-      loggedMinutes: 495,
-      budgetHours: 15,
-      lastEntryLabel: "2 h ago",
-    },
-    {
-      id: 3,
-      label: "Q2 Client Report",
-      icon: "file-text",
-      color: "amber",
-      createdAt: new Date(),
-      pinned: false,
-      completed: false,
-      loggedMinutes: 240,
-      budgetHours: 10,
-      lastEntryLabel: "yesterday",
-    },
-    {
-      id: 4,
-      label: "Internal Tooling",
-      icon: "tool",
-      color: "gray",
-      createdAt: new Date(),
-      pinned: false,
-      completed: true,
-      loggedMinutes: 1200,
-      budgetHours: 20,
-      lastEntryLabel: "3 days ago",
     },
   ];
 
@@ -154,7 +104,24 @@
   <section>
     <p class="section-label mb-3">Recent projects</p>
     <div class="island p-4">
-      <RecentProjects projects={recentProjects} />
+      {#await instance.recentlyUsedProjects(5)}
+        <div
+          class="flex items-center justify-center py-6 text-sm text-tx-faint">
+          <span class="animate-pulse">Loading recent projects...</span>
+        </div>
+      {:then liveRecentProjects}
+        {#if liveRecentProjects && liveRecentProjects.length > 0}
+          <RecentProjects projects={liveRecentProjects} />
+        {:else}
+          <div class="text-center py-6 text-sm text-tx-faint">
+            No recently used projects found.
+          </div>
+        {/if}
+      {:catch error}
+        <div class="text-center py-6 text-sm text-error">
+          Failed to load recent projects.
+        </div>
+      {/await}
     </div>
   </section>
 

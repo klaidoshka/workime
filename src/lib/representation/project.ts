@@ -10,3 +10,8 @@ export interface Project {
   icon?: string;
   color?: string;
 };
+
+export interface RecentProject extends Project {
+  loggedMinutes: number;
+  lastEntryLabel: string;
+}
